@@ -19,17 +19,13 @@ static uint8_t GetColumnFromUser(const Board& board) {
 	}
 }
 
-static void SwitchPlayer(BoardPiece& player) {
-	auto temp = static_cast<int>(player) + 1;
-	player = static_cast<BoardPiece>(temp % 2);
-}
-
 int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
 	Game game;
-	for (int i = 0; i < 10; i++) {
+
+	while (!game.IsGameOver()) {
 		game.Play(GetColumnFromUser(game.GetBoard()));
 		std::cout << game.GetBoard() << std::endl;
 	}

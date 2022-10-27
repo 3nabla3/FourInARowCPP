@@ -21,14 +21,15 @@ public:
 
 	void SwitchPlayer();
 
-	Player Playing();
+	Player Playing() { return m_playing; }
 
-	inline const Board& GetBoard() const { return m_board; }
+	[[nodiscard]] inline const Board& GetBoard() const { return m_board; }
+
 	inline bool IsGameOver() { return m_gameState != GameState::IN_PROGRESS; };
 
-	GameState GetState();
+	[[nodiscard]] GameState GetState() const { return m_gameState; }
 
-	std::array<int, 4> Get4InARow();
+	[[nodiscard]] std::optional<std::array<COORD, 4>> Get4InARow(Player player) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Board& board);
 
@@ -40,5 +41,4 @@ private:
 	COL m_lastPlay = -1; // the last column to be played
 
 	void UpdateBoardState();
-	static BoardPiece ToPiece(Player p);
 };

@@ -46,6 +46,29 @@ bool Board::InsertPiece(COL col, BoardPiece piece) {
 	return true;
 }
 
+std::vector<BoardPiece> Board::GetRow(ROW r) const {
+	std::vector<BoardPiece> res(N_COLS);
+	for (COL c = 0; c < N_COLS; c++)
+		res[c] = GetPiece(r, c);
+
+	return res;
+}
+
+std::vector<BoardPiece> Board::GetCol(COL c) const {
+	std::vector<BoardPiece> res(N_ROWS);
+	for (ROW r = 0; r < N_ROWS; r++)
+		res[r] = GetPiece(r, c);
+
+	return res;
+}
+
+std::vector<BoardPiece> Board::GetUpDiag(uint8_t ud) const {
+	return {};
+}
+
+std::vector<BoardPiece> Board::GetDnDiag(uint8_t dd) const {
+	return {};
+}
 
 std::ostream& operator<<(std::ostream& out, const Board& board) {
 	// print the column numbers

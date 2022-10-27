@@ -7,5 +7,6 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <optional>
 
 #include "glog/logging.h"

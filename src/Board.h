@@ -7,6 +7,7 @@ enum class BoardPiece : int8_t {
 
 typedef uint8_t COL;
 typedef uint8_t ROW;
+typedef std::pair<ROW, COL> COORD;
 
 class Board {
 public:
@@ -29,6 +30,11 @@ public:
 	inline BoardPiece GetPiece(ROW row, COL col) const {
 		return m_state[row * N_COLS + col];
 	}
+
+	[[nodiscard]] std::vector<BoardPiece> GetRow(ROW r) const;
+	[[nodiscard]] std::vector<BoardPiece> GetCol(COL c) const;
+	[[nodiscard]] std::vector<BoardPiece> GetUpDiag(uint8_t ud) const;
+	[[nodiscard]] std::vector<BoardPiece> GetDnDiag(uint8_t dd) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Board& board);
 
