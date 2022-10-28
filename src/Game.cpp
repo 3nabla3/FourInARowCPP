@@ -14,7 +14,7 @@ static Player GetPlaysNext(const Board& board) {
 	}
 
 	// otherwise the board is not valid
-	assert(balance == 0 || balance == 1);
+	LOG_IF(FATAL, balance != 0 && balance != 1) << "The board is not balanced";
 
 	if (balance == 0) // if each player has the same amount of pieces
 		return Player::P1;
@@ -73,7 +73,7 @@ void Game::SwitchPlayer() {
 	m_playing = static_cast<Player>(temp % 2);
 }
 
-// check if the line has a 4 in a row
+// check if the line has a 4 in a row, and return the index if yes
 static int8_t GetIndex4InARow(const std::vector<BoardPiece>& line, Player player) {
 	uint8_t count = 0;
 	for (int i = 0; i < line.size(); i++) {
@@ -84,16 +84,13 @@ static int8_t GetIndex4InARow(const std::vector<BoardPiece>& line, Player player
 		} else
 			count = 0;
 	}
-
-	// if there was a 4 in a row, return the index
+	// since there was no four in a row
 	return -1;
 }
 
-std::optional<std::array<Coord, 4>> Game::Get4InARow(Player player) const {
-
-	// check the rows
+static std::optional<std::array<Coord, 4>> CheckRows(const Board& board, Player player) {
 	for (int row_i = 0; row_i < Board::N_ROWS; row_i++) {
-		std::vector<BoardPiece> row = m_board.GetRow(row_i);
+		std::vector<BoardPiece> row = board.GetRow(row_i);
 
 		// if there is an alignment in the column
 		int8_t col_i = GetIndex4InARow(row, player);
@@ -105,9 +102,12 @@ std::optional<std::array<Coord, 4>> Game::Get4InARow(Player player) const {
 		}
 	}
 
-	// check the columns
+	return {};
+}
+
+static std::optional<std::array<Coord, 4>> CheckColumns(const Board& board, Player player) {
 	for (int col_i = 0; col_i < Board::N_COLS; col_i++) {
-		std::vector<BoardPiece> col = m_board.GetCol(col_i);
+		std::vector<BoardPiece> col = board.GetCol(col_i);
 
 		// if there is an alignment in the column
 		int8_t row_i = GetIndex4InARow(col, player);
@@ -119,5 +119,54 @@ std::optional<std::array<Coord, 4>> Game::Get4InARow(Player player) const {
 		}
 	}
 
-	return std::nullopt;
+	return {};
+}
+
+static std::optional<std::array<Coord, 4>> CheckUpDiag(const Board& board, Player player) {
+	for (int up_diag_i = 0; up_diag_i < Board::N_COLS + Board::N_ROWS - 1; up_diag_i++) {
+		std::vector<BoardPiece> col = board.GetUpDiag(up_diag_i);
+
+		// if there is an alignment in the column
+		int8_t idx = GetIndex4InARow(col, player);
+		if (idx > 0) {
+			std::array<Coord, 4> array;
+			uint8_t x, y;
+			if (up_diag_i < Board::N_ROWS) {
+				y = up_diag_i - 1;
+				x = idx;
+			} else {
+				y = Board::N_ROWS - idx - 1;
+				x = up_diag_i - Board::N_ROWS + idx + 1;
+			}
+			for (int j = 0; j < 4; j++)
+				array[j] = {y - j, x + j};
+			return array;
+		}
+	}
+
+	return {};
+}
+
+
+std::optional<std::array<Coord, 4>> Game::Get4InARow(Player player) const {
+
+	// check the rows
+	if (auto alignment = CheckRows(m_board, player)) {
+		LOG(INFO) << "Found alignment in row";
+		return alignment;
+	}
+
+	// check the columns
+	if (auto alignment = CheckColumns(m_board, player)) {
+		LOG(INFO) << "Found alignment in column";
+		return alignment;
+	}
+
+	// check up diag
+	if (auto alignment = CheckUpDiag(m_board, player)) {
+		LOG(INFO) << "Found alignment in up diag";
+		return alignment;
+	}
+
+	return {};
 }
