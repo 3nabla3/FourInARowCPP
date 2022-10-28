@@ -31,7 +31,7 @@ static BoardPiece ToPiece(Player p) {
 	}
 }
 
-void Game::Play(COL col) {
+void Game::Play(Col col) {
 	if (IsGameOver()) {
 		LOG(WARNING) << "Game is over!";
 		return;
@@ -90,7 +90,7 @@ static int8_t GetIndex4InARow(const std::vector<BoardPiece>& line, Player player
 	return -1;
 }
 
-std::optional<std::array<COORD, 4>> Game::Get4InARow(Player player) const {
+std::optional<std::array<Coord, 4>> Game::Get4InARow(Player player) const {
 
 	// check the rows
 	for (int row_i = 0; row_i < Board::N_ROWS; row_i++) {
@@ -99,7 +99,7 @@ std::optional<std::array<COORD, 4>> Game::Get4InARow(Player player) const {
 		// if there is an alignment in the column
 		int8_t col_i = GetIndex4InARow(row, player);
 		if (col_i > 0) {
-			std::array<COORD, 4> array;
+			std::array<Coord, 4> array;
 			for (int j = 0; j < 4; j++)
 				array[j] = {row_i, row_i + j};
 			return array;
@@ -113,7 +113,7 @@ std::optional<std::array<COORD, 4>> Game::Get4InARow(Player player) const {
 		// if there is an alignment in the column
 		int8_t row_i = GetIndex4InARow(col, player);
 		if (row_i > 0) {
-			std::array<COORD, 4> array;
+			std::array<Coord, 4> array;
 			for (int j = 0; j < 4; j++)
 				array[j] = {row_i + j, col_i};
 			return array;

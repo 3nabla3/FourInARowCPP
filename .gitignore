@@ -1,7 +1,10 @@
 # output files and build folders
 cmake-build*
 vendor/glog/cmake-build*
+out/
+CMakeSettings.json
 
 # ide project directory
 .idea/
+.vs/
 

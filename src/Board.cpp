@@ -22,21 +22,21 @@ void Board::Reset(BoardPiece initial_state[]) {
 }
 
 
-std::unique_ptr<std::vector<COL>> Board::GetValidColumns() const {
+std::unique_ptr<std::vector<Col>> Board::GetValidColumns() const {
 	auto cols = std::make_unique<std::vector<uint8_t>>();
 
-	for (COL col = 0; col < N_COLS; col++)
+	for (Col col = 0; col < N_COLS; col++)
 		if (GetPiece(0, col) == BoardPiece::EMPTY)
 			cols->push_back(col);
 
 	return cols;
 }
 
-bool Board::InsertPiece(COL col, BoardPiece piece) {
+bool Board::InsertPiece(Col col, BoardPiece piece) {
 	if (GetPiece(0, col) != BoardPiece::EMPTY)
 		return false; // the column is full
 
-	ROW row = 0; // start at the top
+	Row row = 0; // start at the top
 
 	// while the piece can still drop
 	while (row < N_ROWS - 1 && GetPiece(row + 1, col) == BoardPiece::EMPTY)
@@ -46,17 +46,17 @@ bool Board::InsertPiece(COL col, BoardPiece piece) {
 	return true;
 }
 
-std::vector<BoardPiece> Board::GetRow(ROW r) const {
+std::vector<BoardPiece> Board::GetRow(Row r) const {
 	std::vector<BoardPiece> res(N_COLS);
-	for (COL c = 0; c < N_COLS; c++)
+	for (Col c = 0; c < N_COLS; c++)
 		res[c] = GetPiece(r, c);
 
 	return res;
 }
 
-std::vector<BoardPiece> Board::GetCol(COL c) const {
+std::vector<BoardPiece> Board::GetCol(Col c) const {
 	std::vector<BoardPiece> res(N_ROWS);
-	for (ROW r = 0; r < N_ROWS; r++)
+	for (Row r = 0; r < N_ROWS; r++)
 		res[r] = GetPiece(r, c);
 
 	return res;
@@ -73,14 +73,14 @@ std::vector<BoardPiece> Board::GetDnDiag(uint8_t dd) const {
 std::ostream& operator<<(std::ostream& out, const Board& board) {
 	// print the column numbers
 	out << "|\t";
-	for (COL i = 0; i < Board::N_COLS; i++)
+	for (Col i = 0; i < Board::N_COLS; i++)
 		out << std::to_string(i) << "\t";
 	out << "|\n";
 
 	// print the board
-	for (ROW row = 0; row < Board::N_ROWS; row++) {
+	for (Row row = 0; row < Board::N_ROWS; row++) {
 		out << "|\t";
-		for (COL col = 0; col < Board::N_COLS; col++) {
+		for (Col col = 0; col < Board::N_COLS; col++) {
 			// out << std::to_string(row * Board::N_COLS + col);
 			switch (board.GetPiece(row, col)) {
 				case (BoardPiece::EMPTY):

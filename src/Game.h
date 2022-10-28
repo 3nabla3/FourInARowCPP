@@ -17,7 +17,7 @@ public:
 	Game();
 	explicit Game(Board initial_board);
 
-	void Play(COL col);
+	void Play(Col col);
 
 	void SwitchPlayer();
 
@@ -29,7 +29,7 @@ public:
 
 	[[nodiscard]] GameState GetState() const { return m_gameState; }
 
-	[[nodiscard]] std::optional<std::array<COORD, 4>> Get4InARow(Player player) const;
+	[[nodiscard]] std::optional<std::array<Coord, 4>> Get4InARow(Player player) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Board& board);
 
@@ -38,7 +38,7 @@ private:
 	GameState m_gameState;
 	Player m_playing;
 
-	COL m_lastPlay = -1; // the last column to be played
+	Col m_lastPlay = -1; // the last column to be played
 
 	void UpdateBoardState();
 };
