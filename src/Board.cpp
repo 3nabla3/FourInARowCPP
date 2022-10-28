@@ -18,18 +18,19 @@ void Board::Reset() {
 
 void Board::Reset(BoardPiece initial_state[]) {
 	// TODO: should this copy? or just get the reference
-	std::memcpy(m_state, initial_state, sizeof(m_state));
+	for (uint8_t i = 0; i < m_state.size(); i++)
+		m_state[i] = initial_state[i];
 }
 
 
-std::unique_ptr<std::vector<Col>> Board::GetValidColumns() const {
-	auto cols = std::make_unique<std::vector<uint8_t>>();
+std::vector<Col> Board::GetValidColumns() const {
+	auto cols = std::vector<uint8_t>();
 
 	for (Col col = 0; col < N_COLS; col++)
 		if (GetPiece(0, col) == BoardPiece::EMPTY)
-			cols->push_back(col);
+			cols.push_back(col);
 
-	return cols;
+	return std::move(cols);
 }
 
 bool Board::InsertPiece(Col col, BoardPiece piece) {

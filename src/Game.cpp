@@ -64,9 +64,8 @@ void Game::UpdateBoardState() {
 	else if (Get4InARow(Player::P2))
 		m_gameState = GameState::P2_WON;
 
-	else if (m_board.GetValidColumns()->empty())  // if there are no more places to play
+	else if (m_board.GetValidColumns().empty())  // if there are no more places to play
 		m_gameState = GameState::TIE;
-
 }
 
 void Game::SwitchPlayer() {

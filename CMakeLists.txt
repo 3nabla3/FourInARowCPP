@@ -10,9 +10,11 @@ if(WIN32)
 	message("Windows config")
 	SET(GLOG_INCLUDE_DIR out/build/x64-Debug/vendor/glog/ vendor/glog/src/)
 	# allow multithreaded compilation
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+	set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+	set(CMAKE_CXX_FLAGS "/MTd")
 endif(WIN32)
+
 
 #target_include_directories(FourInARowCPP PRIVATE . src)
 #target_include_directories(glog PRIVATE ${GLOG_INCLUDE_DIR})

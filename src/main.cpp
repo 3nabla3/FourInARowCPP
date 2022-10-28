@@ -11,7 +11,7 @@ static uint8_t GetColumnFromUser(const Board& board) {
 		std::cin >> col;
 		std::cout << "You entered " << col << std::endl;
 
-		if (std::find(cols->begin(), cols->end(), col) != cols->end())
+		if (std::find(cols.begin(), cols.end(), col) != cols.end())
 			return col;
 		else {
 			LOG(WARNING) << "Column " << col << " is invalid";
