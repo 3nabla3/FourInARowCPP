@@ -6,9 +6,10 @@ static uint8_t GetColumnFromUser(const Board& board) {
 	auto cols = board.GetValidColumns();
 
 	while (true) {
-		int col;
+		std::string inp;
 		LOG(INFO) << "Enter a column: ";
-		std::cin >> col;
+		std::cin >> inp;
+		int col = stoi(inp);
 
 		if (std::find(cols.begin(), cols.end(), col) != cols.end())
 			return col;
