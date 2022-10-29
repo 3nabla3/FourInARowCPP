@@ -10,9 +10,9 @@ if(WIN32)
 	message("Windows config")
 	SET(GLOG_INCLUDE_DIR out/build/x64-Debug/vendor/glog/ vendor/glog/src/)
 	# allow multithreaded compilation
-	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-	set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-	set(CMAKE_CXX_FLAGS "/MTd")
+	set(CMAKE_C_FLAGS_RELEASE "/MT")
+	set(CMAKE_C_FLAGS_DEBUG "/MTd")
+	set(CMAKE_C_FLAGS "/MTd")
 endif(WIN32)
 
 
