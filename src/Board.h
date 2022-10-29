@@ -4,6 +4,8 @@
 enum class BoardPiece : int8_t {
 	EMPTY = -1, P1, P2
 };
+std::ostream& operator<<(std::ostream& out, BoardPiece piece);
+
 
 typedef uint8_t Col;
 typedef uint8_t Row;

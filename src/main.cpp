@@ -7,9 +7,8 @@ static uint8_t GetColumnFromUser(const Board& board) {
 
 	while (true) {
 		int col;
-		std::cout << "Enter a column: " << std::endl;
+		LOG(INFO) << "Enter a column: ";
 		std::cin >> col;
-		std::cout << "You entered " << col << std::endl;
 
 		if (std::find(cols.begin(), cols.end(), col) != cols.end())
 			return col;
@@ -23,8 +22,23 @@ int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
-	Game game;
+	using BoardPiece::EMPTY;
+	using BoardPiece::P1;
+	using BoardPiece::P2;
 
+
+	BoardPiece initial[] = {
+			EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
+			EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
+			EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
+			P1,		P1,		P2,		P2,		P1,		P1,		P2,
+			P2,		P2,		P1,		P1,		P2,		P2,		P1,
+			P1,		P1,		P2,		P2,		P1,		P1,		P2
+	};
+
+	Game game(( Board(initial) ));
+
+	std::cout << game.GetBoard() << std::endl;
 	while (!game.IsGameOver()) {
 		game.Play(GetColumnFromUser(game.GetBoard()));
 		std::cout << game.GetBoard() << std::endl;

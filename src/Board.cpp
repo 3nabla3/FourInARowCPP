@@ -18,7 +18,7 @@ void Board::Reset() {
 
 void Board::Reset(BoardPiece initial_state[]) {
 	// TODO: should this copy? or just get the reference
-	for (uint8_t i = 0; i < m_state.size(); i++)
+	for (int i = 0; i < m_state.size(); i++)
 		m_state[i] = initial_state[i];
 }
 
@@ -63,11 +63,29 @@ std::vector<BoardPiece> Board::GetCol(Col c) const {
 	return res;
 }
 
-std::vector<BoardPiece> Board::GetUpDiag(uint8_t ud) const {
-	return {};
+std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
+	int8_t row_i, col_i;
+	auto i = static_cast<int8_t>(diag_i);
+
+	if (diag_i < Board::N_ROWS) {
+		row_i = i;
+		col_i = 0;
+	} else {
+		row_i = Board::N_ROWS - 1;
+		col_i = static_cast<int8_t>(i - Board::N_ROWS + 1);
+	}
+	// TODO: Find the size of the generated diag to optimize
+	std::vector<BoardPiece> res;
+	while (row_i >= 0 && col_i < Board::N_COLS) {
+		res.push_back(GetPiece(row_i, col_i));
+		row_i--;
+		col_i++;
+	}
+
+	return res;
 }
 
-std::vector<BoardPiece> Board::GetDnDiag(uint8_t dd) const {
+std::vector<BoardPiece> Board::GetDnDiag(uint8_t diag_i) const {
 	return {};
 }
 
@@ -81,27 +99,26 @@ std::ostream& operator<<(std::ostream& out, const Board& board) {
 	// print the board
 	for (Row row = 0; row < Board::N_ROWS; row++) {
 		out << "|\t";
-		for (Col col = 0; col < Board::N_COLS; col++) {
-			// out << std::to_string(row * Board::N_COLS + col);
-			switch (board.GetPiece(row, col)) {
-				case (BoardPiece::EMPTY):
-					out << " ";
-					break;
-				case (BoardPiece::P1):
-					out << "X";
-					break;
-				case (BoardPiece::P2):
-					out << "O";
-					break;
-			}
-			out << "\t";
-		}
+		for (Col col = 0; col < Board::N_COLS; col++)
+			out << board.GetPiece(row, col) << "\t";
 		out << "|\n";
 	}
 
 	return out;
 }
 
-
-
+std::ostream& operator<<(std::ostream& out, BoardPiece piece) {
+	switch(piece) {
+		case (BoardPiece::EMPTY):
+			out << ".";
+			break;
+		case (BoardPiece::P1):
+			out << "X";
+			break;
+		case (BoardPiece::P2):
+			out << "O";
+			break;
+	}
+	return out;
+}
 
