@@ -30,7 +30,7 @@ std::vector<Col> Board::GetValidColumns() const {
 		if (GetPiece(0, col) == BoardPiece::EMPTY)
 			cols.push_back(col);
 
-	return std::move(cols);
+	return cols;
 }
 
 bool Board::InsertPiece(Col col, BoardPiece piece) {

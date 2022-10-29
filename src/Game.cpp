@@ -28,6 +28,8 @@ static BoardPiece ToPiece(Player p) {
 			return BoardPiece::P1;
 		case Player::P2:
 			return BoardPiece::P2;
+		default: // only happens if p is uninitialized
+			return BoardPiece::EMPTY;
 	}
 }
 
