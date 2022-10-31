@@ -10,13 +10,8 @@ enum class GameState : uint8_t {
 	IN_PROGRESS, TIE, P1_WON, P2_WON
 };
 
-// a 4 in a row is an array of size 4
-typedef std::array<Coord, 4> Alignment;
-
 class Game {
 public:
-	static constexpr char PLAYER_SYM[2] = {'X', 'O'};
-
 	Game();
 	explicit Game(Board&& initial_board);
 	Game(const Game& other);
@@ -37,7 +32,7 @@ public:
 
 	[[nodiscard]] std::optional<std::pair<Player, Alignment>> Get4InARow() const;
 
-	friend std::ostream& operator<<(std::ostream& out, const Board& board);
+	friend std::ostream& operator<<(std::ostream& out, const Game& game);
 
 private:
 	Board m_board;
@@ -45,6 +40,7 @@ private:
 	Player m_playing;
 
 	Col m_lastPlay = -1; // the last column to be played
+	std::optional<Alignment> m_alignment{};
 
 	void UpdateBoardState();
 };

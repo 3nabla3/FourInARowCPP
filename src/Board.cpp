@@ -90,7 +90,7 @@ std::vector<BoardPiece> Board::GetDnDiag(uint8_t diag_i) const {
 	int8_t row_i, col_i;
 
 	if (diag_i < Board::N_ROWS) {
-		row_i = (int8_t)(Board::N_ROWS + diag_i);
+		row_i = (int8_t)(Board::N_ROWS - diag_i - 1);
 		col_i = 0;
 	} else {
 		row_i = 0;
@@ -117,12 +117,37 @@ std::ostream& operator<<(std::ostream& out, const Board& board) {
 	// print the board
 	for (Row row = 0; row < Board::N_ROWS; row++) {
 		out << "|\t";
-		for (Col col = 0; col < Board::N_COLS; col++)
+		for (Col col = 0; col < Board::N_COLS; col++) {
 			out << board.GetPiece(row, col) << "\t";
+		}
 		out << "|\n";
 	}
-
 	return out;
+}
+
+std::string Board::ToStringWithAlignment(const Alignment& align) const {
+	std::stringstream ss;
+	// print the column numbers
+	ss << "|\t";
+	for (Col i = 0; i < Board::N_COLS; i++)
+		ss << std::to_string(i) << "\t";
+	ss << "|\n";
+
+	// print the board
+	for (Row row = 0; row < Board::N_ROWS; row++) {
+		ss << "|\t";
+		for (Col col = 0; col < Board::N_COLS; col++) {
+			Coord coord = {row, col};
+			// if the coordinate is in the alignment
+			if (std::find(align.begin(), align.end(), coord) != align.end()) {
+				// color the piece in red
+				ss << "\x1b[31m" << GetPiece(row, col) << "\x1b[39m\t";
+			} else
+				ss << GetPiece(row, col) << "\t";
+		}
+		ss << "|\n";
+	}
+	return ss.str();
 }
 
 std::ostream& operator<<(std::ostream& out, BoardPiece piece) {

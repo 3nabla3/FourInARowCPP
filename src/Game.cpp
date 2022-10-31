@@ -58,6 +58,7 @@ Game::Game() : m_gameState(GameState::IN_PROGRESS), m_playing(Player::P1) {}
 
 Game::Game(Board&& initial_board) : m_board(initial_board), m_gameState(GameState::IN_PROGRESS) {
 	m_playing = GetPlaysNext(initial_board);
+	UpdateBoardState();
 }
 
 Game::Game(const Game& other) {
@@ -76,9 +77,10 @@ Game& Game::operator=(const Game& other) {
 void Game::UpdateBoardState() {
 	// if there is an alignment
 	if (auto alignment = Get4InARow()) {
-		auto [player, _coords] = alignment.value();
+		auto [player, coords] = alignment.value();
 		if (player == Player::P1) m_gameState = GameState::P1_WON;
 		else if (player == Player::P2) m_gameState = GameState::P2_WON;
+		m_alignment = coords;  // remember the alignment to optimize the printing step
 
 	} else if (m_board.GetValidColumns().empty())  // if there are no more places to play
 		m_gameState = GameState::TIE;
@@ -114,7 +116,7 @@ static optional<Alignment> CheckSingleRow(const std::vector<BoardPiece>& row, Pl
 	if (idx >= 0) {
 		Alignment array;
 		for (int j = 0; j < 4; j++)
-			array[j] = {row_i, row_i + j};
+			array[j] = {row_i, idx + j};
 		return array;
 	}
 	return {};
@@ -269,4 +271,14 @@ optional<pair<Player, Alignment>> Game::Get4InARow() const {
 	}
 
 	return {};
+}
+
+std::ostream& operator<<(std::ostream& out, const Game& game) {
+	if (game.m_alignment) {
+		auto coords = game.m_alignment.value();
+		out << game.GetBoard().ToStringWithAlignment(coords);
+	} else
+		out << game.GetBoard();
+
+	return out;
 }

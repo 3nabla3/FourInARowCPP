@@ -29,20 +29,20 @@ int main([[maybe_unused]] int argc, char** argv) {
 
 
 	// BoardPiece initial[] = {
-	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	P1,
-	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	P1,
-	// 		P2,		P2,		P2,		EMPTY,	EMPTY,	EMPTY,	P1,
-	// 		P1,		P1,		P2,		P2,		P1,		P1,		P2,
-	// 		P2,		P2,		P1,		P1,		P2,		P2,		P1,
-	// 		P1,		P1,		P2,		P2,		P1,		P1,		P2
+	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
+	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
+	// 		EMPTY,	P1,		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
+	// 		EMPTY,	P1,		P1,		EMPTY,	EMPTY,	EMPTY,	EMPTY,
+	// 		EMPTY,	P2,		P1,		P1,		EMPTY,	EMPTY,	EMPTY,
+	// 		EMPTY,	P2,		P2,		P2,		P1,		P2,		EMPTY,
 	// };
 
 	Game game;
 
-	std::cout << game.GetBoard() << std::endl;
+	std::cout << game << std::endl;
 	while (!game.IsGameOver()) {
 		game.Play(GetColumnFromUser(game.GetBoard()));
-		std::cout << game.GetBoard() << std::endl;
+		std::cout << game << std::endl;
 	}
 
 	return 0;

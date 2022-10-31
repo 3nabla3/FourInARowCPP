@@ -9,5 +9,7 @@
 #include <cassert>
 #include <optional>
 #include <array>
+#include <sstream>
+#include <cstdlib>
 
 #include "glog/logging.h"

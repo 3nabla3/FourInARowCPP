@@ -6,10 +6,12 @@ enum class BoardPiece : int8_t {
 };
 std::ostream& operator<<(std::ostream& out, BoardPiece piece);
 
-
 typedef uint8_t Col;
 typedef uint8_t Row;
 typedef std::pair<Row, Col> Coord;
+
+// a 4 in a row is an array of size 4
+typedef std::array<Coord, 4> Alignment;
 
 class Board {
 public:
@@ -42,6 +44,7 @@ public:
 	[[nodiscard]] std::vector<BoardPiece> GetDnDiag(uint8_t dd) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Board& board);
+	[[nodiscard]] std::string ToStringWithAlignment(const Alignment& align) const;
 
 private:
 	BoardState m_state{};
