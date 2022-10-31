@@ -9,12 +9,14 @@ Board::Board(BoardPiece initial_state[]) {
 		Reset();
 }
 
+Board::Board(const Board& other) {
+	m_state = other.m_state;
+}
 
 void Board::Reset() {
 	for (auto& i: m_state)
 		i = BoardPiece::EMPTY;
 }
-
 
 void Board::Reset(BoardPiece initial_state[]) {
 	// TODO: should this copy? or just get the reference
@@ -65,14 +67,13 @@ std::vector<BoardPiece> Board::GetCol(Col c) const {
 
 std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
 	int8_t row_i, col_i;
-	auto i = static_cast<int8_t>(diag_i);
 
 	if (diag_i < Board::N_ROWS) {
-		row_i = i;
+		row_i = (int8_t)diag_i;
 		col_i = 0;
 	} else {
 		row_i = Board::N_ROWS - 1;
-		col_i = static_cast<int8_t>(i - Board::N_ROWS + 1);
+		col_i = (int8_t)(diag_i - Board::N_ROWS + 1);
 	}
 	// TODO: Find the size of the generated diag to optimize
 	std::vector<BoardPiece> res;
@@ -86,7 +87,24 @@ std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
 }
 
 std::vector<BoardPiece> Board::GetDnDiag(uint8_t diag_i) const {
-	return {};
+	int8_t row_i, col_i;
+
+	if (diag_i < Board::N_ROWS) {
+		row_i = (int8_t)(Board::N_ROWS + diag_i);
+		col_i = 0;
+	} else {
+		row_i = 0;
+		col_i = (int8_t)(diag_i - Board::N_ROWS + 1);
+	}
+	// TODO: Find the size of the generated diag to optimize
+	std::vector<BoardPiece> res;
+	while (row_i < Board::N_ROWS && col_i < Board::N_COLS) {
+		res.push_back(GetPiece(row_i, col_i));
+		row_i++;
+		col_i++;
+	}
+
+	return res;
 }
 
 std::ostream& operator<<(std::ostream& out, const Board& board) {

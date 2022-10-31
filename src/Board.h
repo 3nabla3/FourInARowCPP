@@ -15,9 +15,11 @@ class Board {
 public:
 	const static Col N_COLS = 7;
 	const static Row N_ROWS = 6;
-	typedef std::array<BoardPiece, Board::N_COLS* Board::N_ROWS> BoardState;
+	typedef std::array<BoardPiece, Board::N_COLS * Board::N_ROWS> BoardState;
 
 	explicit Board(BoardPiece initial_state[] = nullptr);
+	Board(const Board& other);
+	~Board() = default;
 
 	void Reset();
 	void Reset(BoardPiece initial_state[]);
@@ -42,7 +44,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Board& board);
 
 private:
-	BoardState m_state;
+	BoardState m_state{};
 
 	inline void SetPiece(Row row, Col col, BoardPiece piece) {
 		m_state[row * N_COLS + col] = piece;

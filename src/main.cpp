@@ -28,16 +28,16 @@ int main([[maybe_unused]] int argc, char** argv) {
 	using BoardPiece::P2;
 
 
-	BoardPiece initial[] = {
-			EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
-			EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
-			EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
-			P1,		P1,		P2,		P2,		P1,		P1,		P2,
-			P2,		P2,		P1,		P1,		P2,		P2,		P1,
-			P1,		P1,		P2,		P2,		P1,		P1,		P2
-	};
+	// BoardPiece initial[] = {
+	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	P1,
+	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	P1,
+	// 		P2,		P2,		P2,		EMPTY,	EMPTY,	EMPTY,	P1,
+	// 		P1,		P1,		P2,		P2,		P1,		P1,		P2,
+	// 		P2,		P2,		P1,		P1,		P2,		P2,		P1,
+	// 		P1,		P1,		P2,		P2,		P1,		P1,		P2
+	// };
 
-	Game game(( Board(initial) ));
+	Game game;
 
 	std::cout << game.GetBoard() << std::endl;
 	while (!game.IsGameOver()) {
