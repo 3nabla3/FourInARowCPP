@@ -102,7 +102,7 @@ static int8_t GetIndex4InARow(const std::vector<BoardPiece>& line, Player player
 			if (count == 4)  // if there is a 4 in a row
 				return (int8_t) (i - 3);  // jump back 3 to get the start of the line
 		} else
-			count = 0;  // reset the count if we broke the streak
+			count = 0;  // Reset the count if we broke the streak
 	}
 	// since there was no four in a row
 	return -1;

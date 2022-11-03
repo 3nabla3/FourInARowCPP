@@ -12,9 +12,6 @@ if(WIN32)
 	SET(GLOG_INCLUDE_DIR out/build/x64-Debug/vendor/glog/ vendor/glog/src/)
 endif(WIN32)
 
-
-#target_include_directories(FourInARowCPP PRIVATE . src)
-#target_include_directories(glog PRIVATE ${GLOG_INCLUDE_DIR})
 include_directories(. src ${GLOG_INCLUDE_DIR} ${GLFW_INCLUDE_DIR})
 
 
