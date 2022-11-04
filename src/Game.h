@@ -23,7 +23,7 @@ public:
 	Game& operator=(Game&& other) noexcept;
 	~Game() = default;
 
-	void Play(Col col);
+	Game& Play(Col col);
 
 	void SwitchPlayer();
 

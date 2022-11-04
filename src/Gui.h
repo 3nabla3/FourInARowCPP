@@ -9,15 +9,28 @@ public:
 	void Run();
 private:
 	static inline void Vertex(float x, float y) ;
+	static void RenderCircle(float x, float y, float r) ;
+	static void SetPieceColor(BoardPiece piece);
+	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
 	void RenderVerticalLines() const;
 	void RenderHorizontalLines() const;
 	void RenderGrid() const;
+	void RenderPiece(BoardPiece piece, Row row, Col col) const;
+	void ResetColor() const;
+	void RenderBoard() const;
 
 	Game m_Game;
 	GLFWwindow* m_Window;
-	const uint16_t m_Width;
-	const uint16_t m_Height;
+	float m_ResetColor[3] = {1.f, 1.f, 1.f};
 
-	const float m_HeightMarginPercent = .03f;
-	const float m_WidthMarginPercent = .03f;
+	const uint16_t m_Height;
+	const uint16_t m_Width;
+	const float m_HeightMarginFrac = .03f;
+	const float m_WidthMarginFrac = .03f;
+
+	static constexpr int SCREEN_HZ = 144;
+	static const int s_TARGET_FPS = 20;
+
 };

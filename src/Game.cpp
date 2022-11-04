@@ -75,12 +75,13 @@ static BoardPiece ToPiece(Player p) {
 	}
 }
 
-void Game::Play(Col col) {
-	/// let a user place a piece and update the state
+Game& Game::Play(Col col) {
+	/// Let a user place a piece and update the state.
+	///  Return a reference to itself to allow method chaining
 
 	if (IsGameOver()) {
 		LOG(WARNING) << "Game is over!";
-		return;
+		return *this;
 	}
 	m_board.InsertPiece(col, ToPiece(m_playing));
 	SwitchPlayer();
@@ -90,6 +91,8 @@ void Game::Play(Col col) {
 	if (m_gameState == GameState::TIE) LOG(INFO) << "Tie!";
 	else if (m_gameState == GameState::P1_WON) LOG(INFO) << "Player 1 won!";
 	else if (m_gameState == GameState::P2_WON) LOG(INFO) << "Player 2 won!";
+
+	return *this;
 }
 
 void Game::UpdateBoardState() {

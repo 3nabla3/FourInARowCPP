@@ -11,5 +11,8 @@
 #include <array>
 #include <sstream>
 #include <cstdlib>
+#include <thread>
+#include <utility>
+#include <cmath>
 
 #include "glog/logging.h"

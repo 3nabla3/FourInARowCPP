@@ -26,6 +26,12 @@ int main([[maybe_unused]] int argc, char** argv) {
 
 	// Board board;
 	Game game;
+	game
+	.Play(3)
+	.Play(3)
+	.Play(4)
+	.Play(5);
+
 	Gui gui(std::move(game));
 	gui.Run();
 
