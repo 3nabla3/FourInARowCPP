@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum class BoardPiece : int8_t {
 	EMPTY = -1, P1, P2
 };
@@ -19,12 +18,18 @@ public:
 	const static Row N_ROWS = 6;
 	typedef std::array<BoardPiece, Board::N_COLS * Board::N_ROWS> BoardState;
 
-	explicit Board(BoardPiece initial_state[] = nullptr);
+	// Custom constructor
+	explicit Board(const BoardPiece initial_state[] = nullptr);
+
+	// Rule of 5
 	Board(const Board& other);
+	Board(Board&& other) noexcept;
+	Board& operator=(const Board& other);
+	Board& operator=(Board&& other) noexcept;
 	~Board() = default;
 
 	void Reset();
-	void Reset(BoardPiece initial_state[]);
+	void Reset(const BoardPiece initial_state[]);
 	bool InsertPiece(Col col, BoardPiece piece);
 
 	[[nodiscard]]

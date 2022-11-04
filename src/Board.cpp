@@ -2,7 +2,7 @@
 #include "Board.h"
 
 
-Board::Board(BoardPiece initial_state[]) {
+Board::Board(const BoardPiece initial_state[]) {
 	if (initial_state)
 		Reset(initial_state);
 	else
@@ -10,7 +10,25 @@ Board::Board(BoardPiece initial_state[]) {
 }
 
 Board::Board(const Board& other) {
+	LOG(WARNING) << "Calling Board copy constructor";
 	m_state = other.m_state;
+}
+
+Board::Board(Board&& other)  noexcept {
+	LOG(WARNING) << "Calling Board R-value move constructor";
+	m_state = other.m_state;
+}
+
+Board& Board::operator=(const Board& other) {
+	LOG(WARNING) << "Calling Board copy assignment";
+	m_state = other.m_state;
+	return *this;
+}
+
+Board& Board::operator=(Board&& other) noexcept {
+	LOG(WARNING) << "Calling Board move assignment";
+	m_state = other.m_state;
+	return *this;
 }
 
 void Board::Reset() {
@@ -18,7 +36,7 @@ void Board::Reset() {
 		i = BoardPiece::EMPTY;
 }
 
-void Board::Reset(BoardPiece initial_state[]) {
+void Board::Reset(const BoardPiece initial_state[]) {
 	// TODO: should this copy? or just get the reference
 	for (int i = 0; i < m_state.size(); i++)
 		m_state[i] = initial_state[i];

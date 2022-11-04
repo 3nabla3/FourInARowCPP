@@ -2,23 +2,24 @@
 #include "glog/logging.h"
 #include "Timer.h"
 #include <thread>
+#include <utility>
 
-Gui::Gui(const Game& game, uint16_t width, uint16_t height)
-		: m_Game(game), m_Width(width), m_Height(height) {
-	LOG(INFO) << "Attempting to initialize window";
+Gui::Gui(Game game, uint16_t width, uint16_t height)
+		: m_Game(std::move(game)), m_Width(width), m_Height(height) {
+	LOG(INFO) << "Attempting to initialize window, please wait...";
 	if (!glfwInit())
-		LOG(FATAL) << "Could not initialize glfw";
+		LOG(FATAL) << "Could not initialize glfw!";
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	m_Window = glfwCreateWindow(m_Width, m_Height, "Hello World", nullptr, nullptr);
 	if (!m_Window) {
 		glfwTerminate();
-		LOG(FATAL) << "Could not create window";
+		LOG(FATAL) << "Could not create window!";
 	}
 
 	glfwMakeContextCurrent(m_Window);
-	LOG(INFO) << "Completed windows initialization";
+	LOG(INFO) << "Completed windows initialization!";
 }
 
 void Gui::Run() {

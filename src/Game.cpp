@@ -4,15 +4,53 @@
 
 using std::optional, std::pair, std::vector, std::array;
 
-static Player GetPlaysNext(const Board& board) {
+Game::Game() : m_gameState(GameState::IN_PROGRESS), m_playing(Player::P1) {}
+
+Game::Game(Board&& initial_board) : m_board(std::move(initial_board)), m_gameState(GameState::IN_PROGRESS) {
+	LOG(WARNING) << "Calling Game with R-value reference of Board";
+	m_playing = GetPlaysNext();
+	UpdateBoardState();
+}
+
+Game::Game(const Game& other) {
+	LOG(WARNING) << "Calling Game copy constructor";
+	m_playing = other.m_playing;
+	m_gameState = other.m_gameState;
+	m_board = other.m_board;
+}
+
+Game::Game(Game&& other) noexcept {
+	LOG(WARNING) << "Calling Game R-value move constructor";
+	m_playing = other.m_playing;
+	m_gameState = other.m_gameState;
+	m_board = std::move(other.m_board);
+}
+
+Game& Game::operator=(const Game& other) {
+	LOG(WARNING) << "Calling Game copy operator";
+	m_playing = other.m_playing;
+	m_gameState = other.m_gameState;
+	m_board = other.m_board;
+	return *this;
+}
+
+Game& Game::operator=(Game&& other) noexcept {
+	LOG(WARNING) << "Calling Game R-value move assignment";
+	m_playing = other.m_playing;
+	m_gameState = other.m_gameState;
+	m_board = std::move(other.m_board);
+	return *this;
+}
+
+Player Game::GetPlaysNext() {
 	/// Verify if the board is valid, and then who's turn is it to play
 
 	// are there more of P1's or P2's pieces
 	uint8_t balance = 0;
 	for (int i = 0; i < Board::N_COLS * Board::N_ROWS; i++) {
-		if (board.GetState()[i] == BoardPiece::P1)
+		if (m_board.GetState()[i] == BoardPiece::P1)
 			balance++;
-		else if (board.GetState()[i] == BoardPiece::P2)
+		else if (m_board.GetState()[i] == BoardPiece::P2)
 			balance--;
 	}
 
@@ -52,26 +90,6 @@ void Game::Play(Col col) {
 	if (m_gameState == GameState::TIE) LOG(INFO) << "Tie!";
 	else if (m_gameState == GameState::P1_WON) LOG(INFO) << "Player 1 won!";
 	else if (m_gameState == GameState::P2_WON) LOG(INFO) << "Player 2 won!";
-}
-
-Game::Game() : m_gameState(GameState::IN_PROGRESS), m_playing(Player::P1) {}
-
-Game::Game(Board&& initial_board) : m_board(initial_board), m_gameState(GameState::IN_PROGRESS) {
-	m_playing = GetPlaysNext(initial_board);
-	UpdateBoardState();
-}
-
-Game::Game(const Game& other) {
-	m_playing = other.m_playing;
-	m_gameState = other.m_gameState;
-	m_board = other.m_board;
-}
-
-Game& Game::operator=(const Game& other) {
-	m_playing = other.m_playing;
-	m_gameState = other.m_gameState;
-	m_board = other.m_board;
-	return *this;
 }
 
 void Game::UpdateBoardState() {

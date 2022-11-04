@@ -12,11 +12,16 @@ enum class GameState : uint8_t {
 
 class Game {
 public:
+	// custom constructors
 	Game();
 	explicit Game(Board&& initial_board);
+
+	// Rule of 5
 	Game(const Game& other);
-	~Game() = default;
+	Game(Game&& other) noexcept;
 	Game& operator=(const Game& other);
+	Game& operator=(Game&& other) noexcept;
+	~Game() = default;
 
 	void Play(Col col);
 
@@ -42,5 +47,6 @@ private:
 	Col m_lastPlay = -1; // the last column to be played
 	std::optional<Alignment> m_alignment{};
 
+	Player GetPlaysNext();
 	void UpdateBoardState();
 };
