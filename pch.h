@@ -14,5 +14,6 @@
 #include <thread>
 #include <utility>
 #include <cmath>
+#include <bits/stdc++.h>  // apparently, this is needed to iterate over vectors
 
 #include "glog/logging.h"

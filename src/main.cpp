@@ -4,7 +4,7 @@
 #include "Gui.h"
 
 static uint8_t GetColumnFromUser(const Board& board) {
-	auto cols = board.GetValidColumns();
+	std::vector<Col> cols = board.GetValidColumns();
 
 	while (true) {
 		std::string inp;
@@ -24,7 +24,6 @@ int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
-	// Board board;
 	Game game;
 	game
 	.Play(3)
