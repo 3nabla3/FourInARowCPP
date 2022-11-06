@@ -29,8 +29,11 @@ endif(WIN32)
 
 target_precompile_headers(FourInARowCPP PUBLIC pch.h)
 target_link_libraries(FourInARowCPP glog glfw)
-# windows and unix have different names for the opengl library
-if(UNIX)
+
+# windows, linux, and macos have different names for the opengl library
+if(APPLE)
+	target_link_libraries(FourInARowCPP OpenGL)
+elseif(UNIX)
 	target_link_libraries(FourInARowCPP GL)
 endif(UNIX)
 if(WIN32)
