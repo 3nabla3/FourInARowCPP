@@ -7,7 +7,6 @@ Gui::Gui(Game game, uint16_t width, uint16_t height)
 	LOG(INFO) << "Attempting to initialize window, please wait...";
 	if (!glfwInit())
 		LOG(FATAL) << "Could not initialize glfw!";
-
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	m_Window = glfwCreateWindow(m_Width, m_Height, "Hello World", nullptr, nullptr);
@@ -17,6 +16,12 @@ Gui::Gui(Game game, uint16_t width, uint16_t height)
 	}
 
 	glfwMakeContextCurrent(m_Window);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		LOG(FATAL) << "Failed to initialize GLAD";
+	}
+
 	LOG(INFO) << "Completed windows initialization!";
 
 	glfwSetKeyCallback(m_Window, KeyCallback);
@@ -27,6 +32,7 @@ void Gui::Run() {
 
 	LOG(INFO) << "Starting main loop";
 	while (!glfwWindowShouldClose(m_Window)) {
+
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		RenderGrid();

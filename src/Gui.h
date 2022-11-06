@@ -1,5 +1,6 @@
 #pragma once
 #include "Game.h"
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 /// this class uses a vertex space of [0, 1] * [0, 1] while openGl uses [-1, 1] * [-1, 1]
