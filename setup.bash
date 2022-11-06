@@ -10,6 +10,7 @@ if [[ $(make -j "$(nproc)") -ne 0 ]]; then
   echo "Compilation failed"
   exit
 fi
+cd .. || exit
 
 # Run the executable
 echo "Running the executable"

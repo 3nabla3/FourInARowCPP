@@ -3,6 +3,7 @@ cmake-build*
 vendor/glog/cmake-build*
 out/
 CMakeSettings.json
+build/
 
 # ide project directory
 .idea/
