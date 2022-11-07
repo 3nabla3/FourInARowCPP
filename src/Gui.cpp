@@ -93,7 +93,7 @@ void Gui::RenderPiece(BoardPiece piece, Row row, Col col) const {
 	float x = m_WidthMarginFrac + stepX * (float)col + stepX / 2;
 	float stepY = (1 - m_HeightMarginFrac * 2) / Board::N_ROWS;
 	float y = m_HeightMarginFrac + stepY * (float)row + stepY / 2;
-	float r = std::min(stepX, stepY) / 4;
+	float r = min(stepX, stepY) / 4;
 
 	SetPieceColor(piece);
 	RenderCircle(x, y, r);
