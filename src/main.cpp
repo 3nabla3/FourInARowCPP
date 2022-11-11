@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Board.h"
 #include "Game.h"
-#include "Gui.h"
+#include "GuiApp.h"
+#include "MinMax.h"
 
 static uint8_t GetColumnFromUser(const Board& board) {
 	std::vector<Col> cols = board.GetValidColumns();
@@ -25,13 +26,11 @@ int main([[maybe_unused]] int argc, char** argv) {
 	google::InitGoogleLogging(argv[0]);
 
 	Game game;
-	game
-	.Play(3)
-	.Play(3)
-	.Play(4)
-	.Play(5);
+	// game.Play(3).Play(3).Play(4).Play(5);
 
-	Gui gui(std::move(game));
+	MinMax mm(Player::P2, 5);
+	GuiApp gui(std::move(game));
+	gui.AttachAlgo(mm);
 	gui.Run();
 
 	return 0;

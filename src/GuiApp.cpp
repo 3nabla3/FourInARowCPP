@@ -1,14 +1,14 @@
-#include "Gui.h"
+#include "GuiApp.h"
 #include "glog/logging.h"
 #include "Timer.h"
 
 struct UserInfo {
 	/// used to pass a buffer of data to the glfw callback functions
-	Gui* gui;
+	GuiApp* gui;
 };
 
 
-Gui::Gui(Game game, uint16_t width, uint16_t height)
+GuiApp::GuiApp(Game game, uint16_t width, uint16_t height)
 		: m_Game(std::move(game)), m_Width(width), m_Height(height) {
 	LOG(INFO) << "Attempting to initialize window, please wait...";
 	if (!glfwInit())
@@ -38,7 +38,13 @@ Gui::Gui(Game game, uint16_t width, uint16_t height)
 	LOG(INFO) << "Completed windows initialization!";
 }
 
-void Gui::Run() {
+void GuiApp::AttachAlgo(MinMax algo) {
+	m_Algo = algo;
+	m_AlgoActive = true;
+	m_Algo.SetGame(m_Game);
+}
+
+void GuiApp::Run() {
 	using namespace std::literals::chrono_literals;
 
 	LOG(INFO) << "Starting main loop";
@@ -48,15 +54,8 @@ void Gui::Run() {
 		RenderGrid();
 		RenderBoard();
 
-#if 0
-		if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1)) {
-			double x;
-			glfwGetCursorPos(m_Window, &x, nullptr);
-			// if the played clicked on the board, play in the specified area
-			if (auto col = ConvertGLFWposToColumn(x))
-				m_Game.Play(col.value());
-		}
-#endif
+		if (m_Game.Playing() == m_Algo.PlayingAs() && !m_Game.IsGameOver() && m_AlgoActive)
+			m_Game.Play(m_Algo.GetBestMove());
 
 		glfwSwapBuffers(m_Window);
 		glfwPollEvents();
@@ -65,19 +64,19 @@ void Gui::Run() {
 	LOG(INFO) << "Main loop ended";
 }
 
-void Gui::Vertex(float x, float y) {
+void GuiApp::Vertex(float x, float y) {
 	/// converts from a [0, 1] * [0, 1] space to a [-1, 1] * [-1, 1] space
 	glVertex2f(x * 2 - 1, y * 2 - 1);
 }
 
-void Gui::RenderGrid() const {
+void GuiApp::RenderGrid() const {
 	glBegin(GL_LINES);
 	RenderVerticalLines();
 	RenderHorizontalLines();
 	glEnd();
 }
 
-void Gui::RenderVerticalLines() const {
+void GuiApp::RenderVerticalLines() const {
 	float startX = m_WidthMarginFrac;
 	float endX = 1 - startX;
 	float stepX = (endX - startX) / Board::N_COLS;
@@ -91,7 +90,7 @@ void Gui::RenderVerticalLines() const {
 	}
 }
 
-void Gui::RenderHorizontalLines() const {
+void GuiApp::RenderHorizontalLines() const {
 	float startY = m_HeightMarginFrac;
 	float endY = 1 - startY;
 	float stepY = (endY - startY) / Board::N_ROWS;
@@ -104,7 +103,7 @@ void Gui::RenderHorizontalLines() const {
 	}
 }
 
-void Gui::RenderPiece(BoardPiece piece, Row row, Col col) const {
+void GuiApp::RenderPiece(BoardPiece piece, Row row, Col col) const {
 	// flip the row_i because the 0th row is at the top in memory but
 	// should be at the bottom in the grid
 	row = Board::N_ROWS - 1 - row;
@@ -122,7 +121,7 @@ void Gui::RenderPiece(BoardPiece piece, Row row, Col col) const {
 	RenderCircle(x, y, r);
 }
 
-void Gui::RenderCircle(float x, float y, float r) {
+void GuiApp::RenderCircle(float x, float y, float r) {
 	// how many edges on the circle:
 	// the more, the softer the circle but the more expensive the draw
 
@@ -135,7 +134,7 @@ void Gui::RenderCircle(float x, float y, float r) {
 	glEnd();
 }
 
-void Gui::RenderBoard() const {
+void GuiApp::RenderBoard() const {
 	for (Row row_i = 0; row_i < Board::N_ROWS; row_i++) {
 		for (Col col_i = 0; col_i < Board::N_COLS; col_i++) {
 			BoardPiece piece = m_Game.GetBoard().GetPiece(row_i, col_i);
@@ -146,7 +145,7 @@ void Gui::RenderBoard() const {
 	ResetColor();
 }
 
-void Gui::SetPieceColor(BoardPiece piece) {
+void GuiApp::SetPieceColor(BoardPiece piece) {
 	// if the piece is empty, don't bother settings it because the circle
 	// should never even be drawn
 
@@ -157,43 +156,36 @@ void Gui::SetPieceColor(BoardPiece piece) {
 
 }
 
-void Gui::ResetColor() const {
+void GuiApp::ResetColor() const {
 	glColor3fv(m_ResetColor);
 }
 
-void Gui::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (action == 1) {
-		LOG(INFO) << "key: " << std::to_string(key)
-				  << " scancode: " << std::to_string(scancode)
-				  << " mods: " << std::to_string(mods);
+void GuiApp::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (action == GLFW_PRESS) {
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
-		key -= 48;
+		key -= 0x30; // convert the ascii char into the actual int value;
 		ui.gui->Play(key);
 	}
 }
 
-void Gui::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-	if (button == 0 && action == 1) {
+void GuiApp::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
-		LOG(INFO) << "button: " << std::to_string(button)
-				  << " action: " << std::to_string(action)
-				  << " mods: " << std::to_string(mods)
-				  << " (x, y): (" << std::to_string(x) << ", " << std::to_string(y) << ")";
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
 		if (auto col = ui.gui->ConvertGLFWposToColumn(x))
 			ui.gui->Play(col.value());
 	}
 }
 
-void Gui::Play(Col col) {
+void GuiApp::Play(Col col) {
 	if (col >= 0 && col < Board::N_COLS)
 		m_Game.Play(col);
 	else
 		LOG(WARNING) << "Invalid column";
 }
 
-std::optional<Col> Gui::ConvertGLFWposToColumn(double x) const {
+std::optional<Col> GuiApp::ConvertGLFWposToColumn(double x) const {
 	float marginWidth = m_WidthMarginFrac * (float) m_Width;
 	if (x < marginWidth || x > (float) m_Width - marginWidth) {
 		LOG(WARNING) << "Clicked out of bounds!";
