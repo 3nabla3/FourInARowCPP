@@ -14,7 +14,7 @@ Board::Board(const Board& other) {
 	m_state = other.m_state;
 }
 
-Board::Board(Board&& other)  noexcept {
+Board::Board(Board&& other) noexcept {
 	DLOG(WARNING) << "Calling Board R-value move constructor";
 	m_state = other.m_state;
 }
@@ -54,10 +54,13 @@ std::vector<Col> Board::GetValidColumns() const {
 }
 
 bool Board::InsertPiece(Col col, BoardPiece piece) {
-	if (GetPiece(0, col) != BoardPiece::EMPTY)
-		return false; // the column is full
-
 	Row row = 0; // start at the top
+
+	// Check the top row of the given column
+	if (GetPiece(row, col) != BoardPiece::EMPTY) {
+		LOG(ERROR) << "Column " << std::to_string(col) << " is full";
+		return false;
+	}
 
 	// while the piece can still drop
 	while (row < N_ROWS - 1 && GetPiece(row + 1, col) == BoardPiece::EMPTY)
@@ -87,11 +90,11 @@ std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
 	int8_t row_i, col_i;
 
 	if (diag_i < Board::N_ROWS) {
-		row_i = (int8_t)diag_i;
+		row_i = (int8_t) diag_i;
 		col_i = 0;
 	} else {
 		row_i = Board::N_ROWS - 1;
-		col_i = (int8_t)(diag_i - Board::N_ROWS + 1);
+		col_i = (int8_t) (diag_i - Board::N_ROWS + 1);
 	}
 	// TODO: Find the size of the generated diag to optimize
 	std::vector<BoardPiece> res;
@@ -108,11 +111,11 @@ std::vector<BoardPiece> Board::GetDnDiag(uint8_t diag_i) const {
 	int8_t row_i, col_i;
 
 	if (diag_i < Board::N_ROWS) {
-		row_i = (int8_t)(Board::N_ROWS - diag_i - 1);
+		row_i = (int8_t) (Board::N_ROWS - diag_i - 1);
 		col_i = 0;
 	} else {
 		row_i = 0;
-		col_i = (int8_t)(diag_i - Board::N_ROWS + 1);
+		col_i = (int8_t) (diag_i - Board::N_ROWS + 1);
 	}
 	// TODO: Find the size of the generated diag to optimize
 	std::vector<BoardPiece> res;
@@ -169,7 +172,7 @@ std::string Board::ToStringWithAlignment(const Alignment& align) const {
 }
 
 std::ostream& operator<<(std::ostream& out, BoardPiece piece) {
-	switch(piece) {
+	switch (piece) {
 		case (BoardPiece::EMPTY):
 			out << ".";
 			break;

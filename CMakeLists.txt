@@ -22,6 +22,7 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 add_subdirectory(vendor/glog)
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/glad)
+add_subdirectory(tests)
 
 file(GLOB SOURCE_FILES *.cpp *.h ./src/*.cpp ./src/*.h)
 

@@ -83,7 +83,12 @@ Game& Game::Play(Col col) {
 		LOG(ERROR) << "Game is over!";
 		return *this;
 	}
-	m_board.InsertPiece(col, ToPiece(m_playing));
+
+	// if the function returns false, the column is full,
+	// so we cannot process the input
+	if (!m_board.InsertPiece(col, ToPiece(m_playing)))
+		return *this;
+
 	SwitchPlayer();
 	UpdateBoardState();
 	m_lastPlay = col;
@@ -150,7 +155,7 @@ static optional<pair<Player, Alignment>> CheckRows(const Board& board) {
 
 	for (int row_i = 0; row_i < Board::N_ROWS; row_i++) {
 		std::vector<BoardPiece> row = board.GetRow(row_i);
-		for (auto player : players) {
+		for (auto player: players) {
 			auto align = CheckSingleRow(row, player, row_i);
 			if (align)
 				return pair(player, align.value());
@@ -218,7 +223,7 @@ static optional<pair<Player, Alignment>> CheckUpDiag(const Board& board) {
 
 	for (int up_diag_i = 0; up_diag_i < Board::N_COLS + Board::N_ROWS - 1; up_diag_i++) {
 		std::vector<BoardPiece> diag = board.GetUpDiag(up_diag_i);
-		for (auto player : players) {
+		for (auto player: players) {
 			auto align = CheckSingleUpDiag(diag, player, up_diag_i);
 			if (align)
 				return pair(player, align.value());
@@ -256,7 +261,7 @@ static optional<pair<Player, Alignment>> CheckDnDiag(const Board& board) {
 
 	for (int dn_diag_i = 0; dn_diag_i < Board::N_COLS + Board::N_ROWS - 1; dn_diag_i++) {
 		std::vector<BoardPiece> diag = board.GetDnDiag(dn_diag_i);
-		for (auto player : players) {
+		for (auto player: players) {
 			auto align = CheckSingleDnDiag(diag, player, dn_diag_i);
 			if (align)
 				return pair(player, align.value());
