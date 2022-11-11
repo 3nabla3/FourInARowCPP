@@ -24,6 +24,6 @@ private:
 #ifdef NDEBUG
 #define SCOPED_TIMER(name)
 #else
-#define SCOPED_TIMER(name) Timer MAKE_UNIQUE(timer)(name, __func__);
+#define SCOPED_TIMER(name) Timer MAKE_UNIQUE(timer)(name, __func__)
 #endif
 

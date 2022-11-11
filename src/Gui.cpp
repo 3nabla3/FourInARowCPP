@@ -2,6 +2,12 @@
 #include "glog/logging.h"
 #include "Timer.h"
 
+struct UserInfo {
+	/// used to pass a buffer of data to the glfw callback functions
+	Gui* gui;
+};
+
+
 Gui::Gui(Game game, uint16_t width, uint16_t height)
 		: m_Game(std::move(game)), m_Width(width), m_Height(height) {
 	LOG(INFO) << "Attempting to initialize window, please wait...";
@@ -17,14 +23,19 @@ Gui::Gui(Game game, uint16_t width, uint16_t height)
 
 	glfwMakeContextCurrent(m_Window);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
+	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
 		LOG(FATAL) << "Failed to initialize GLAD";
 	}
 
-	LOG(INFO) << "Completed windows initialization!";
+	/// set the user info that will be used during callbacks
+	auto* userinfo = new UserInfo();
+	userinfo->gui = this;
+	glfwSetWindowUserPointer(m_Window, userinfo);
 
 	glfwSetKeyCallback(m_Window, KeyCallback);
+	glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
+
+	LOG(INFO) << "Completed windows initialization!";
 }
 
 void Gui::Run() {
@@ -32,11 +43,20 @@ void Gui::Run() {
 
 	LOG(INFO) << "Starting main loop";
 	while (!glfwWindowShouldClose(m_Window)) {
-
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		RenderGrid();
 		RenderBoard();
+
+#if 0
+		if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1)) {
+			double x;
+			glfwGetCursorPos(m_Window, &x, nullptr);
+			// if the played clicked on the board, play in the specified area
+			if (auto col = ConvertGLFWposToColumn(x))
+				m_Game.Play(col.value());
+		}
+#endif
 
 		glfwSwapBuffers(m_Window);
 		glfwPollEvents();
@@ -90,9 +110,9 @@ void Gui::RenderPiece(BoardPiece piece, Row row, Col col) const {
 	row = Board::N_ROWS - 1 - row;
 
 	float stepX = (1 - m_WidthMarginFrac * 2) / Board::N_COLS;
-	float x = m_WidthMarginFrac + stepX * (float)col + stepX / 2;
+	float x = m_WidthMarginFrac + stepX * (float) col + stepX / 2;
 	float stepY = (1 - m_HeightMarginFrac * 2) / Board::N_ROWS;
-	float y = m_HeightMarginFrac + stepY * (float)row + stepY / 2;
+	float y = m_HeightMarginFrac + stepY * (float) row + stepY / 2;
 	// min is a macro on Windows but a function
 	// on unix so this should fix it
 	using std::min;
@@ -106,10 +126,10 @@ void Gui::RenderCircle(float x, float y, float r) {
 	// how many edges on the circle:
 	// the more, the softer the circle but the more expensive the draw
 
-	int steps = 10;
+	int steps = 15;
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < steps; i++) {
-		auto angle_theta = (float)((double)i * std::numbers::pi) / ((float)steps / 2.f);
+		auto angle_theta = (float) ((double) i * std::numbers::pi) / ((float) steps / 2.f);
 		Vertex(x + r * std::cos(angle_theta), y + r * std::sin(angle_theta));
 	}
 	glEnd();
@@ -142,8 +162,43 @@ void Gui::ResetColor() const {
 }
 
 void Gui::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	LOG(INFO) << "key: " << std::to_string(key)
-	<< " scancode: " << std::to_string(scancode)
-	<< " action: " << std::to_string(action)
-	<< " mods: " << std::to_string(mods);
+	if (action == 1) {
+		LOG(INFO) << "key: " << std::to_string(key)
+				  << " scancode: " << std::to_string(scancode)
+				  << " mods: " << std::to_string(mods);
+		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
+		key -= 48;
+		ui.gui->Play(key);
+	}
+}
+
+void Gui::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	if (button == 0 && action == 1) {
+		double x, y;
+		glfwGetCursorPos(window, &x, &y);
+		LOG(INFO) << "button: " << std::to_string(button)
+				  << " action: " << std::to_string(action)
+				  << " mods: " << std::to_string(mods)
+				  << " (x, y): (" << std::to_string(x) << ", " << std::to_string(y) << ")";
+		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
+		if (auto col = ui.gui->ConvertGLFWposToColumn(x))
+			ui.gui->Play(col.value());
+	}
+}
+
+void Gui::Play(Col col) {
+	if (col >= 0 && col < Board::N_COLS)
+		m_Game.Play(col);
+	else
+		LOG(WARNING) << "Invalid column";
+}
+
+std::optional<Col> Gui::ConvertGLFWposToColumn(double x) const {
+	float marginWidth = m_WidthMarginFrac * (float) m_Width;
+	if (x < marginWidth || x > (float) m_Width - marginWidth) {
+		LOG(WARNING) << "Clicked out of bounds!";
+		return {};
+	}
+	float ratio = (float) (x - marginWidth) / ((float) m_Width - marginWidth * 2);
+	return ratio * Board::N_COLS;
 }
