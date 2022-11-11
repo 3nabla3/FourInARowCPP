@@ -16,8 +16,9 @@ private:
 	static inline void Vertex(float x, float y);
 	static void RenderCircle(float x, float y, float r);
 	static void SetPieceColor(BoardPiece piece);
-	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+	static void KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] [[maybe_unused]] int scancode, int action,
+							[[maybe_unused]] [[maybe_unused]] int mods);
+	static void MouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods);
 
 
 	[[nodiscard]] std::optional<Col> ConvertGLFWposToColumn(double x) const;

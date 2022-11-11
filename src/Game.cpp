@@ -7,27 +7,27 @@ using std::optional, std::pair, std::vector, std::array;
 Game::Game() : m_gameState(GameState::IN_PROGRESS), m_playing(Player::P1) {}
 
 Game::Game(Board&& initial_board) : m_board(std::move(initial_board)), m_gameState(GameState::IN_PROGRESS) {
-	LOG(WARNING) << "Calling Game with R-value reference of Board";
+	DLOG(WARNING) << "Calling Game with R-value reference of Board";
 	m_playing = GetPlaysNext();
 	UpdateBoardState();
 }
 
 Game::Game(const Game& other) {
-	LOG(WARNING) << "Calling Game copy constructor";
+	DLOG(WARNING) << "Calling Game copy constructor";
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = other.m_board;
 }
 
 Game::Game(Game&& other) noexcept {
-	LOG(WARNING) << "Calling Game R-value move constructor";
+	DLOG(WARNING) << "Calling Game R-value move constructor";
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = std::move(other.m_board);
 }
 
 Game& Game::operator=(const Game& other) {
-	LOG(WARNING) << "Calling Game copy operator";
+	DLOG(WARNING) << "Calling Game copy operator";
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = other.m_board;
@@ -35,7 +35,7 @@ Game& Game::operator=(const Game& other) {
 }
 
 Game& Game::operator=(Game&& other) noexcept {
-	LOG(WARNING) << "Calling Game R-value move assignment";
+	DLOG(WARNING) << "Calling Game R-value move assignment";
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = std::move(other.m_board);
@@ -80,7 +80,7 @@ Game& Game::Play(Col col) {
 	///  Return a reference to itself to allow method chaining
 
 	if (IsGameOver()) {
-		LOG(WARNING) << "Game is over!";
+		LOG(ERROR) << "Game is over!";
 		return *this;
 	}
 	m_board.InsertPiece(col, ToPiece(m_playing));
@@ -269,25 +269,25 @@ static optional<pair<Player, Alignment>> CheckDnDiag(const Board& board) {
 optional<pair<Player, Alignment>> Game::Get4InARow() const {
 	// check the rows
 	if (auto alignment = CheckRows(m_board)) {
-		LOG(INFO) << "Found alignment in row";
+		DLOG(INFO) << "Found alignment in row";
 		return alignment;
 	}
 
 	// check the columns
 	if (auto alignment = CheckColumns(m_board)) {
-		LOG(INFO) << "Found alignment in column";
+		DLOG(INFO) << "Found alignment in column";
 		return alignment;
 	}
 
 	// check up diag
 	if (auto alignment = CheckUpDiag(m_board)) {
-		LOG(INFO) << "Found alignment in up diag";
+		DLOG(INFO) << "Found alignment in up diag";
 		return alignment;
 	}
 
 	// check down diag
 	if (auto alignment = CheckDnDiag(m_board)) {
-		LOG(INFO) << "Found alignment in down diag";
+		DLOG(INFO) << "Found alignment in down diag";
 		return alignment;
 	}
 

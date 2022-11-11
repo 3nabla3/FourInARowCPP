@@ -1,6 +1,5 @@
 #include "GuiApp.h"
 #include "glog/logging.h"
-#include "Timer.h"
 
 struct UserInfo {
 	/// used to pass a buffer of data to the glfw callback functions
@@ -10,7 +9,7 @@ struct UserInfo {
 
 GuiApp::GuiApp(Game game, uint16_t width, uint16_t height)
 		: m_Game(std::move(game)), m_Width(width), m_Height(height) {
-	LOG(INFO) << "Attempting to initialize window, please wait...";
+	DLOG(INFO) << "Attempting to initialize window, please wait...";
 	if (!glfwInit())
 		LOG(FATAL) << "Could not initialize glfw!";
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -35,7 +34,7 @@ GuiApp::GuiApp(Game game, uint16_t width, uint16_t height)
 	glfwSetKeyCallback(m_Window, KeyCallback);
 	glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
 
-	LOG(INFO) << "Completed windows initialization!";
+	DLOG(INFO) << "Completed windows initialization!";
 }
 
 void GuiApp::AttachAlgo(MinMax algo) {
@@ -47,7 +46,7 @@ void GuiApp::AttachAlgo(MinMax algo) {
 void GuiApp::Run() {
 	using namespace std::literals::chrono_literals;
 
-	LOG(INFO) << "Starting main loop";
+	DLOG(INFO) << "Starting main loop";
 	while (!glfwWindowShouldClose(m_Window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -61,7 +60,7 @@ void GuiApp::Run() {
 		glfwPollEvents();
 		glfwSwapInterval(SCREEN_HZ / s_TARGET_FPS);
 	}
-	LOG(INFO) << "Main loop ended";
+	DLOG(INFO) << "Main loop ended";
 }
 
 void GuiApp::Vertex(float x, float y) {
@@ -160,7 +159,7 @@ void GuiApp::ResetColor() const {
 	glColor3fv(m_ResetColor);
 }
 
-void GuiApp::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void GuiApp::KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
 	if (action == GLFW_PRESS) {
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
 		key -= 0x30; // convert the ascii char into the actual int value;
@@ -168,7 +167,7 @@ void GuiApp::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-void GuiApp::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+void GuiApp::MouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) {
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
@@ -182,13 +181,13 @@ void GuiApp::Play(Col col) {
 	if (col >= 0 && col < Board::N_COLS)
 		m_Game.Play(col);
 	else
-		LOG(WARNING) << "Invalid column";
+		DLOG(WARNING) << "Invalid column";
 }
 
 std::optional<Col> GuiApp::ConvertGLFWposToColumn(double x) const {
 	float marginWidth = m_WidthMarginFrac * (float) m_Width;
 	if (x < marginWidth || x > (float) m_Width - marginWidth) {
-		LOG(WARNING) << "Clicked out of bounds!";
+		DLOG(WARNING) << "Clicked out of bounds!";
 		return {};
 	}
 	float ratio = (float) (x - marginWidth) / ((float) m_Width - marginWidth * 2);

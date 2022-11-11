@@ -10,23 +10,23 @@ Board::Board(const BoardPiece initial_state[]) {
 }
 
 Board::Board(const Board& other) {
-	LOG(WARNING) << "Calling Board copy constructor";
+	DLOG(WARNING) << "Calling Board copy constructor";
 	m_state = other.m_state;
 }
 
 Board::Board(Board&& other)  noexcept {
-	LOG(WARNING) << "Calling Board R-value move constructor";
+	DLOG(WARNING) << "Calling Board R-value move constructor";
 	m_state = other.m_state;
 }
 
 Board& Board::operator=(const Board& other) {
-	LOG(WARNING) << "Calling Board copy assignment";
+	DLOG(WARNING) << "Calling Board copy assignment";
 	m_state = other.m_state;
 	return *this;
 }
 
 Board& Board::operator=(Board&& other) noexcept {
-	LOG(WARNING) << "Calling Board move assignment";
+	DLOG(WARNING) << "Calling Board move assignment";
 	m_state = other.m_state;
 	return *this;
 }

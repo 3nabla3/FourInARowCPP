@@ -12,7 +12,7 @@ long Timer::MsElapsed() const {
 }
 
 Timer::~Timer() {
-	LOG_EVERY_N(INFO, 10) << "[" << m_Prefix << "] " << std::to_string(MsElapsed()) << " ms elapsed";
+	DLOG_EVERY_N(INFO, 10) << "[" << m_Prefix << "] " << std::to_string(MsElapsed()) << " ms elapsed";
 }
 
 void Timer::Reset() {

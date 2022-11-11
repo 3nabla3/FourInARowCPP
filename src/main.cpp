@@ -9,20 +9,21 @@ static uint8_t GetColumnFromUser(const Board& board) {
 
 	while (true) {
 		std::string inp;
-		LOG(INFO) << "Enter a column: ";
+		DLOG(INFO) << "Enter a column: ";
 		std::cin >> inp;
 		int col = stoi(inp);
 
 		if (std::find(cols.begin(), cols.end(), col) != cols.end())
 			return col;
 		else {
-			LOG(WARNING) << "Column " << col << " is invalid";
+			DLOG(WARNING) << "Column " << col << " is invalid";
 		}
 	}
 }
 
 int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
+	// FLAGS_logtostderr = true;
 	google::InitGoogleLogging(argv[0]);
 
 	Game game;

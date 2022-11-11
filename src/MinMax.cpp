@@ -3,7 +3,7 @@
 
 MinMax::MinMax(Player playingAs, uint8_t depth)
 		: m_playingAs(playingAs), m_maxDepth(depth) {
-	LOG(INFO) << "Initializing min max with max depth of " << std::to_string(depth);
+	DLOG(INFO) << "Initializing min max with max depth of " << std::to_string(depth);
 }
 
 MinMax::MinMax()
