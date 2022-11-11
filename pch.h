@@ -15,9 +15,14 @@
 #include <utility>
 #include <cmath>
 #include <numbers>
+#include <algorithm>
 
 #ifdef __linux__
 	#include <bits/stdc++.h>  // apparently, this is needed to iterate over vectors
+#else 
+	#ifdef WIN32
+		#include <Windows.h>
+	#endif
 #endif
 
 #include "glog/logging.h"
