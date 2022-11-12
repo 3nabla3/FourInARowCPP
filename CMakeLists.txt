@@ -2,19 +2,19 @@ cmake_minimum_required(VERSION 3.22)
 project(FourInARowCPP)
 set(CMAKE_CXX_STANDARD 23)
 
+set(GLFW_INCLUDE_DIR vendor/glfw/include)
+set(GLAD_INCLUDE_DIR vendor/glad/include)
+set(GLOG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/vendor/glog/ vendor/glog/src/)
+set(BOOST_INCLUDE_DIR vendor/boost/)
 
-if(UNIX)
-	set(GLOG_INCLUDE_DIR cmake-build-release/vendor/glog/ vendor/glog/src/)
-	set(GLFW_INCLUDE_DIR vendor/glfw/include)
-	set(GLAD_INCLUDE_DIR vendor/glad/include)
-endif(UNIX)
-if(WIN32)
-	SET(GLOG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/vendor/glog/ vendor/glog/src/)
-	SET(GLAD_INCLUDE_DIR vendor/glad/include)
-	set(GLFW_INCLUDE_DIR vendor/glfw/include)
-endif(WIN32)
+#if(UNIX)
+#	set(GLOG_INCLUDE_DIR cmake-build-release/vendor/glog/ vendor/glog/src/)
+#endif(UNIX)
+#if(WIN32)
+	
+#endif(WIN32)
 
-include_directories(. src ${GLOG_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLAD_INCLUDE_DIR})
+include_directories(. src ${GLOG_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLAD_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
 
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
