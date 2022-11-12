@@ -1,4 +1,4 @@
-# Install script for directory: /home/alban/Documents/coding/FourInARowCPP/vendor/glog
+# Install script for directory: /home/alban/Documents/coding/LibFourInARowCPP/vendor/glog
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

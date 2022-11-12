@@ -1,4 +1,6 @@
-#include "pch.h"
+#include <iostream>
+#include "glog/logging.h"
+
 #include "Board.h"
 #include "Game.h"
 #include "GuiApp.h"

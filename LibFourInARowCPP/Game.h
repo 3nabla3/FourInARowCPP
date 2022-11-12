@@ -29,13 +29,13 @@ public:
 
 	Player Playing() { return m_playing; }
 
-	[[nodiscard]] inline const Board& GetBoard() const { return m_board; }
-
 	[[nodiscard]] inline bool IsGameOver() const { return GetState() != GameState::IN_PROGRESS; };
 
+	[[nodiscard]] inline const Board& GetBoard() const { return m_board; }
 	[[nodiscard]] GameState GetState() const { return m_gameState; }
-
 	[[nodiscard]] std::optional<std::pair<Player, Alignment>> Get4InARow() const;
+	[[nodiscard]] inline const std::optional<Alignment>& GetAlignment() const { return m_alignment; }
+	[[nodiscard]] inline Col GetLastPlay() const { return m_lastPlay; }
 
 	friend std::ostream& operator<<(std::ostream& out, const Game& game);
 

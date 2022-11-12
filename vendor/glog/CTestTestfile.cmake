@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
-# Source directory: /home/alban/Documents/coding/FourInARowCPP/vendor/glog
-# Build directory: /home/alban/Documents/coding/FourInARowCPP/vendor/glog
+# Source directory: /home/alban/Documents/coding/LibFourInARowCPP/vendor/glog
+# Build directory: /home/alban/Documents/coding/LibFourInARowCPP/vendor/glog
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
