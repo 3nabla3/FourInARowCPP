@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "GuiApp.h"
-#include "glog/logging.h"
 
 struct UserInfo {
 	/// used to pass a buffer of data to the glfw callback functions
