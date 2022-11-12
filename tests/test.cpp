@@ -1,9 +1,9 @@
-#define BOOST_TEST_MODULE isEq
+#define BOOST_TEST_MODULE Comparisons
 #include <boost/test/included/unit_test.hpp>
+#include "pch.h"
+#include "Board.h"
 
-BOOST_AUTO_TEST_CASE(isEq) {
-	int a = 5;
-	int b = 6;
-	BOOST_CHECK_EQUAL(a + 1, b);
-	BOOST_CHECK_NE(a, b);
+BOOST_AUTO_TEST_CASE(testBoard) {
+	Board board;
+	BOOST_CHECK_EQUAL(board.GetPiece(0, 0), BoardPiece::EMPTY);
 }

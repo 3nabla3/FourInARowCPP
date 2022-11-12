@@ -9,7 +9,7 @@
 /// this class uses a vertex space of [0, 1] * [0, 1] while openGl uses [-1, 1] * [-1, 1]
 class GuiApp {
 public:
-	explicit GuiApp(Game game, uint16_t width = 700, uint16_t height = 700);
+	explicit GuiApp(Game  game, uint16_t width = 700, uint16_t height = 700);
 	void AttachAlgo(MinMax algo);
 	void Run();
 private:
