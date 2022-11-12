@@ -15,7 +15,7 @@ public:
 private:
 	static inline void Vertex(float x, float y);
 	static void RenderCircle(float x, float y, float r);
-	static void SetPieceColor(BoardPiece piece);
+	static void SetPieceColor(BoardPiece piece, bool highlight = false);
 	static void KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] [[maybe_unused]] int scancode, int action,
 							[[maybe_unused]] [[maybe_unused]] int mods);
 	static void MouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods);
@@ -29,6 +29,8 @@ private:
 	void ResetColor() const;
 	void RenderBoard() const;
 	void Play(Col col);
+
+	[[nodiscard]] inline bool ShouldHighlight(Row row, Col col) const;
 
 	[[nodiscard]] inline const Game& GetGame() const { return m_Game; }
 

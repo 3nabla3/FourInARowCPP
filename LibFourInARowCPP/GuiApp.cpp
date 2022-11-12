@@ -102,21 +102,40 @@ void GuiApp::RenderHorizontalLines() const {
 	}
 }
 
+static bool InAlignment(const std::array<Coord, 4> align, Row row, Col col) {
+	auto res = std::ranges::any_of(align.begin(), align.end(), [row, col](auto elem) {
+		return (elem.first == row && elem.second == col);
+	});
+	return res;
+}
+
+bool GuiApp::ShouldHighlight(Row row, Col col) const {
+	// is the piece in the alignment of 4 in a row
+	if (auto alignment = m_Game.GetAlignment())
+		if (InAlignment(alignment.value(), row, col))
+			return true;
+	// the piece the last piece to be played
+	if (m_Game.GetLastPlay() == col)
+		if (row == 0 || m_Game.GetBoard().GetPiece(row - 1, col) == BoardPiece::EMPTY)
+			return true;
+	return false;
+}
+
 void GuiApp::RenderPiece(BoardPiece piece, Row row, Col col) const {
-	// flip the row_i because the 0th row is at the top in memory but
-	// should be at the bottom in the grid
-	row = Board::N_ROWS - 1 - row;
+	// Set the effective row to the flipped version of the row because
+	// in opengl, lower y values are lower on the screen
+	Row e_row = Board::N_ROWS - 1 - row;
 
 	float stepX = (1 - m_WidthMarginFrac * 2) / Board::N_COLS;
 	float x = m_WidthMarginFrac + stepX * (float) col + stepX / 2;
 	float stepY = (1 - m_HeightMarginFrac * 2) / Board::N_ROWS;
-	float y = m_HeightMarginFrac + stepY * (float) row + stepY / 2;
+	float y = m_HeightMarginFrac + stepY * (float) e_row + stepY / 2;
 	// min is a macro on Windows but a function
 	// on unix so this should fix it
 	using std::min;
 	float r = min(stepX, stepY) / 4;
 
-	SetPieceColor(piece);
+	SetPieceColor(piece, ShouldHighlight(row, col));
 	RenderCircle(x, y, r);
 }
 
@@ -144,15 +163,21 @@ void GuiApp::RenderBoard() const {
 	ResetColor();
 }
 
-void GuiApp::SetPieceColor(BoardPiece piece) {
+void GuiApp::SetPieceColor(BoardPiece piece, bool highlight) {
 	// if the piece is empty, don't bother settings it because the circle
 	// should never even be drawn
 
-	if (piece == BoardPiece::P1)
-		glColor3f(1.f, 0.f, 0.f);
-	else if (piece == BoardPiece::P2)
-		glColor3f(0.f, 0.f, 1.f);
-
+	if (highlight) {
+		if (piece == BoardPiece::P1)
+			glColor3f(1.f, 0.f, 0.f);
+		if (piece == BoardPiece::P2)
+			glColor3f(0.f, 0.f, 1.f);
+	} else {
+		if (piece == BoardPiece::P1)
+			glColor3f(.5f, 0.f, 0.f);
+		if (piece == BoardPiece::P2)
+			glColor3f(0.f, 0.f, .5f);
+	}
 }
 
 void GuiApp::ResetColor() const {
