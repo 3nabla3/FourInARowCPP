@@ -2,34 +2,22 @@ cmake_minimum_required(VERSION 3.22)
 project(FourInARowCPP)
 set(CMAKE_CXX_STANDARD 23)
 
-set(GLFW_INCLUDE_DIR vendor/glfw/include)
-set(GLAD_INCLUDE_DIR vendor/glad/include)
-set(GLOG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/vendor/glog/ vendor/glog/src/)
-set(BOOST_INCLUDE_DIR vendor/boost/)
-
-#if(UNIX)
-#	set(GLOG_INCLUDE_DIR cmake-build-release/vendor/glog/ vendor/glog/src/)
-#endif(UNIX)
-#if(WIN32)
-	
-#endif(WIN32)
-
-include_directories(. src ${GLOG_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLAD_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
-
-
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
+add_subdirectory(LibFourInARowCPP)
 add_subdirectory(vendor/glog)
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/glad)
 add_subdirectory(tests)
 
-file(GLOB SOURCE_FILES *.cpp *.h ./src/*.cpp ./src/*.h)
+SET(GLOG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/vendor/glog/src/ ${CMAKE_BINARY_DIR}/vendor/glog/)
+SET(GLAD_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/vendor/glad/include)
+set(GLFW_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/vendor/glfw/include)
 
+include_directories(LibFourInARowCPP ${GLOG_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLAD_INCLUDE_DIR})
+
+file(GLOB SOURCE_FILES src/*cpp) 
 add_executable(FourInARowCPP ${SOURCE_FILES})
 if(WIN32)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT src/main.cpp)
 endif(WIN32)
 
-target_precompile_headers(FourInARowCPP PUBLIC pch.h)
-target_link_libraries(FourInARowCPP glog glfw glad)
+target_link_libraries(FourInARowCPP LibFourInARowCPP)

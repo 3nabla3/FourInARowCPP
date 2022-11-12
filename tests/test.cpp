@@ -1,17 +1,9 @@
-#define BOOST_TEST_MODULE myModule
+#define BOOST_TEST_MODULE isEq
 #include <boost/test/included/unit_test.hpp>
+#include "LibFourInARowCPP/Board.h"
 
-BOOST_AUTO_TEST_CASE(isEq) {
-	int a = 5;
-	int b = 6;
-	BOOST_CHECK_EQUAL(a + 1, b);
-	BOOST_CHECK_NE(a, b);
-}
-
-BOOST_AUTO_TEST_CASE(isNotEq) {
-	int a = 10;
-	int b = 10;
-	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK_EQUAL(a, 10);
-	BOOST_CHECK_EQUAL(9, b - 1);
+BOOST_AUTO_TEST_CASE(testBoard) {
+	Board board;
+	auto piece = board.GetPiece(0, 0);
+	BOOST_CHECK_EQUAL(piece, BoardPiece::EMPTY);
 }

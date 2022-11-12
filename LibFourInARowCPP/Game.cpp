@@ -106,7 +106,7 @@ void Game::UpdateBoardState() {
 		auto [player, coords] = alignment.value();
 		if (player == Player::P1) m_gameState = GameState::P1_WON;
 		else if (player == Player::P2) m_gameState = GameState::P2_WON;
-		m_alignment = coords;  // remember the alignment to optimize the printing step
+		m_alignment = std::move(coords);  // remember the alignment to optimize the printing step
 
 	} else if (m_board.GetValidColumns().empty())  // if there are no more places to play
 		m_gameState = GameState::TIE;

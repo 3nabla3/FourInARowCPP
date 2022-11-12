@@ -187,7 +187,7 @@
 #define STL_NAMESPACE std
 
 /* location of source code */
-#define TEST_SRC_DIR "/home/alban/Documents/coding/FourInARowCPP/vendor/glog"
+#define TEST_SRC_DIR "/home/alban/Documents/coding/LibFourInARowCPP/vendor/glog"
 
 /* Define to necessary thread-local storage attribute. */
 #define GLOG_THREAD_LOCAL_STORAGE __thread

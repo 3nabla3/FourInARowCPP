@@ -1,6 +1,5 @@
+#include "pch.h"
 #include "Timer.h"
-
-#include <utility>
 
 Timer::Timer(std::string name, std::string prefix)
 :m_Name(std::move(name)), m_Prefix(std::move(prefix)){
