@@ -1,14 +1,16 @@
 #include "pch.h"
 #include "GuiApp.h"
 
+#include <utility>
+
 struct UserInfo {
 	/// used to pass a buffer of data to the glfw callback functions
 	GuiApp* gui;
 };
 
 
-GuiApp::GuiApp(Game game, uint16_t width, uint16_t height)
-		: m_Game(std::move(game)), m_Width(width), m_Height(height) {
+GuiApp::GuiApp(Game& game, uint16_t width, uint16_t height)
+		: m_Game(&game), m_Width(width), m_Height(height) {
 	DLOG(INFO) << "Attempting to initialize window, please wait...";
 	if (!glfwInit())
 		LOG(FATAL) << "Could not initialize glfw!";
@@ -37,14 +39,15 @@ GuiApp::GuiApp(Game game, uint16_t width, uint16_t height)
 	DLOG(INFO) << "Completed windows initialization!";
 }
 
-void GuiApp::AttachAlgo(MinMax algo) {
-	m_Algo = algo;
-	m_AlgoActive = true;
-	m_Algo.SetGame(m_Game);
+GuiApp::~GuiApp() {
+	DLOG(INFO) << "Destroying Gui App";
+	glfwTerminate();
 }
 
 void GuiApp::Run() {
 	using namespace std::literals::chrono_literals;
+
+	m_Game->Start();
 
 	DLOG(INFO) << "Starting main loop";
 	while (!glfwWindowShouldClose(m_Window)) {
@@ -53,14 +56,13 @@ void GuiApp::Run() {
 		RenderGrid();
 		RenderBoard();
 
-		if (m_Game.Playing() == m_Algo.PlayingAs() && !m_Game.IsGameOver() && m_AlgoActive)
-			m_Game.Play(m_Algo.GetBestMove());
-
 		glfwSwapBuffers(m_Window);
 		glfwPollEvents();
 		glfwSwapInterval(SCREEN_HZ / s_TARGET_FPS);
 	}
 	DLOG(INFO) << "Main loop ended";
+
+	m_Game->End();
 }
 
 void GuiApp::Vertex(float x, float y) {
@@ -111,12 +113,12 @@ static bool InAlignment(const std::array<Coord, 4> align, Row row, Col col) {
 
 bool GuiApp::ShouldHighlight(Row row, Col col) const {
 	// is the piece in the alignment of 4 in a row
-	if (auto alignment = m_Game.GetAlignment())
+	if (auto alignment = m_Game->GetAlignment())
 		if (InAlignment(alignment.value(), row, col))
 			return true;
 	// the piece the last piece to be played
-	if (m_Game.GetLastPlay() == col)
-		if (row == 0 || m_Game.GetBoard().GetPiece(row - 1, col) == BoardPiece::EMPTY)
+	if (m_Game->GetLastPlay() == col)
+		if (row == 0 || m_Game->GetBoard().GetPiece(row - 1, col) == BoardPiece::EMPTY)
 			return true;
 	return false;
 }
@@ -155,7 +157,7 @@ void GuiApp::RenderCircle(float x, float y, float r) {
 void GuiApp::RenderBoard() const {
 	for (Row row_i = 0; row_i < Board::N_ROWS; row_i++) {
 		for (Col col_i = 0; col_i < Board::N_COLS; col_i++) {
-			BoardPiece piece = m_Game.GetBoard().GetPiece(row_i, col_i);
+			BoardPiece piece = m_Game->GetBoard().GetPiece(row_i, col_i);
 			if (piece != BoardPiece::EMPTY)
 				RenderPiece(piece, row_i, col_i);
 		}
@@ -204,7 +206,7 @@ void GuiApp::MouseButtonCallback(GLFWwindow* window, int button, int action, [[m
 
 void GuiApp::Play(Col col) {
 	if (col >= 0 && col < Board::N_COLS)
-		m_Game.Play(col);
+		m_Game->Play(col);
 	else
 		DLOG(WARNING) << "Invalid column";
 }

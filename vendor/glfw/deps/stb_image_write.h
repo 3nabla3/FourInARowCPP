@@ -59,7 +59,7 @@ USAGE:
      int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
      int stbi_write_tga_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
      int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const float *data);
-     int stbi_write_jpg_to_func(stbi_write_func *func, void *context, int x, int y, int comp, const void *data, int quality);
+     int stbi_write_jpg_to_func(stbi_write_func *AlgoWorkerFunc, void *context, int x, int y, int comp, const void *data, int quality);
 
    where the callback is:
       void stbi_write_func(void *context, void *data, int size);

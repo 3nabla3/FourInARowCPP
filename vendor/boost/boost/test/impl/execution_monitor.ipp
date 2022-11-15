@@ -1149,7 +1149,7 @@ assert_reporting_function( int reportType, char* userMessage, int* )
 
 void BOOST_TEST_CALL_DECL
 invalid_param_handler( wchar_t const* /* expr */,
-                       wchar_t const* /* func */,
+                       wchar_t const* /* AlgoWorkerFunc */,
                        wchar_t const* /* file */,
                        unsigned       /* line */,
                        uintptr_t      /* reserved */)

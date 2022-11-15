@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #ifdef __linux__
-	#include <bits/stdc++.h>  // apparently, this is needed to iterate over vectors
+	// #include <bits/stdc++.h>  // apparently, this is needed to iterate over vectors
 #else 
 	#ifdef WIN32
 		#include <Windows.h>

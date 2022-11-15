@@ -7,11 +7,12 @@ MinMax::MinMax(Player playingAs, uint8_t depth)
 }
 
 MinMax::MinMax()
-		: m_maxDepth(5), m_playingAs(Player::P1) {
+		: m_maxDepth(5), m_playingAs(Player::P2) {
 }
 
 Col MinMax::GetBestMove() const {
-	Col chosen = m_Game->GetBoard().GetValidColumns().at(0);
+	Col chosen = m_Board->GetValidColumns().at(0);
 	LOG(INFO) << "[MinMax]: Col " << std::to_string(chosen);
+
 	return chosen;
 }

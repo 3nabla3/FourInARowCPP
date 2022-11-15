@@ -1,17 +1,17 @@
 #pragma once
 
-#include "Game.h"
 #include "MinMax.h"
+#include "Game.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 
-/// this class uses a vertex space of [0, 1] * [0, 1] while openGl uses [-1, 1] * [-1, 1]
+/// this class uses a vertex space of [0, 1] * [0, 1] while openGl uses [es [-1, 1] * [-1, 1]
 class GuiApp {
 public:
-	explicit GuiApp(Game  game, uint16_t width = 700, uint16_t height = 700);
-	void AttachAlgo(MinMax algo);
+	explicit GuiApp(Game& game, uint16_t width = 700, uint16_t height = 700);
 	void Run();
+	~GuiApp();
 private:
 	static inline void Vertex(float x, float y);
 	static void RenderCircle(float x, float y, float r);
@@ -32,15 +32,9 @@ private:
 
 	[[nodiscard]] inline bool ShouldHighlight(Row row, Col col) const;
 
-	[[nodiscard]] inline const Game& GetGame() const { return m_Game; }
-
-	Game m_Game;
+	Game* m_Game;
 	GLFWwindow* m_Window;
 	float m_ResetColor[3] = {1.f, 1.f, 1.f};
-	// whether the algo was actually supplied at runtime,
-	// or was it default constructed at compile time
-	bool m_AlgoActive = false;
-	MinMax m_Algo;
 
 	const uint16_t m_Height;
 	const uint16_t m_Width;

@@ -1331,7 +1331,7 @@ bool Demangle(const char *mangled, char *out, size_t out_size) {
   // library provides a more complicated `Symbol->Name` with the
   // Incremental Linking Table offset, which looks like
   // `@ILT+1105(?func@Foo@@SAXH@Z)`. However, the demangler expects
-  // only the mangled symbol, `?func@Foo@@SAXH@Z`. Fortunately, the
+  // only the mangled symbol, `?AlgoWorkerFunc@Foo@@SAXH@Z`. Fortunately, the
   // mangled symbol is guaranteed not to have parentheses,
   // so we search for `(` and extract up to `)`.
   //

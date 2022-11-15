@@ -17,6 +17,8 @@ Game::Game(const Game& other) {
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = other.m_board;
+	m_algoActive = other.m_algoActive;
+	m_algo = other.m_algo;
 }
 
 Game::Game(Game&& other) noexcept {
@@ -24,6 +26,8 @@ Game::Game(Game&& other) noexcept {
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = std::move(other.m_board);
+	m_algoActive = other.m_algoActive;
+	m_algo = other.m_algo;
 }
 
 Game& Game::operator=(const Game& other) {
@@ -31,6 +35,8 @@ Game& Game::operator=(const Game& other) {
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = other.m_board;
+	m_algoActive = other.m_algoActive;
+	m_algo = other.m_algo;
 	return *this;
 }
 
@@ -39,7 +45,16 @@ Game& Game::operator=(Game&& other) noexcept {
 	m_playing = other.m_playing;
 	m_gameState = other.m_gameState;
 	m_board = std::move(other.m_board);
+	m_algoActive = other.m_algoActive;
+	m_algo = other.m_algo;
 	return *this;
+}
+
+void Game::AttachAlgo(MinMax mm) {
+	// TODO: optimize to make sure this does not take a copy once mm becomes big
+	m_algo = mm;
+	m_algoActive = true;
+	m_algo.SetBoard(GetBoardPtr());
 }
 
 Player Game::GetPlaysNext() {
@@ -61,6 +76,31 @@ Player Game::GetPlaysNext() {
 		return Player::P1;
 	else
 		return Player::P2;
+}
+
+void Game::AlgoWorkerFunc() {
+	using namespace std::chrono_literals;
+
+	while (m_algoActive) {
+		if (m_playing == m_algo.PlayingAs() && !IsGameOver()) {
+			auto col = m_algo.GetBestMove();
+			Play(col);
+		}
+		std::this_thread::sleep_for(500ms);
+	}
+}
+
+void Game::Start() {
+	DLOG(INFO) << "Creating algo thread";
+	m_algoThread = std::thread(&Game::AlgoWorkerFunc, this);
+	DLOG(INFO) << "Algo thread has been created";
+}
+
+void Game::End() {
+	// ensures the thread stops
+	m_algoActive = false;
+	m_algoThread.join();
+	DLOG(INFO) << "Algo thread has joined";
 }
 
 static BoardPiece ToPiece(Player p) {

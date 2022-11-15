@@ -99,7 +99,7 @@ static void static_func() {
 
 TEST(Symbolize, Symbolize) {
   // We do C-style cast since GCC 2.95.3 doesn't allow
-  // reinterpret_cast<void *>(&func).
+  // reinterpret_cast<void *>(&AlgoWorkerFunc).
 
   // Compilers should give us pointers to them.
   EXPECT_STREQ("nonstatic_func", TrySymbolize((void *)(&nonstatic_func)));
@@ -133,7 +133,7 @@ void ATTRIBUTE_NOINLINE Foo::func(int x) {
 TEST(Symbolize, SymbolizeWithDemangling) {
   Foo::func(100);
 #if !defined(_MSC_VER) || !defined(NDEBUG)
-  EXPECT_STREQ("Foo::func()", TrySymbolize((void *)(&Foo::func)));
+  EXPECT_STREQ("Foo::AlgoWorkerFunc()", TrySymbolize((void *)(&Foo::func)));
 #endif
 }
 #endif
@@ -308,7 +308,7 @@ TEST(Symbolize, SymbolizeWithDemanglingStackConsumption) {
   symbol = SymbolizeStackConsumption(reinterpret_cast<void *>(&Foo::func),
                                      &stack_consumed);
 
-  EXPECT_STREQ("Foo::func()", symbol);
+  EXPECT_STREQ("Foo::AlgoWorkerFunc()", symbol);
   EXPECT_GT(stack_consumed, 0);
   EXPECT_LT(stack_consumed, kStackConsumptionUpperLimit);
 }
@@ -397,7 +397,7 @@ TEST(Symbolize, SymbolizeWithDemangling) {
   const char* ret = TrySymbolize((void *)(&Foo::func));
 
 #if defined(HAVE_DBGHELP) && !defined(NDEBUG)
-  EXPECT_STREQ("public: static void __cdecl Foo::func(int)", ret);
+  EXPECT_STREQ("public: static void __cdecl Foo::AlgoWorkerFunc(int)", ret);
 #endif
 }
 
