@@ -87,12 +87,12 @@ static const char *TrySymbolize(void *pc) {
 extern "C" {
 void nonstatic_func();
 void nonstatic_func() {
-  volatile int a = 0;
+  int a = 0;
   ++a;
 }
 
 static void static_func() {
-  volatile int a = 0;
+  int a = 0;
   ++a;
 }
 }
@@ -123,7 +123,7 @@ struct Foo {
 };
 
 void ATTRIBUTE_NOINLINE Foo::func(int x) {
-  volatile int a = x;
+  int a = x;
   ++a;
 }
 
