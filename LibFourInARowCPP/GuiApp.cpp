@@ -41,6 +41,8 @@ GuiApp::GuiApp(Game& game, uint16_t width, uint16_t height)
 
 GuiApp::~GuiApp() {
 	DLOG(INFO) << "Destroying Gui App";
+	auto* ui = static_cast<UserInfo*>(glfwGetWindowUserPointer(m_Window));
+	delete ui;
 	glfwTerminate();
 }
 
