@@ -1,5 +1,4 @@
 #pragma once
-#include <chrono>
 
 class Timer {
 public:
@@ -21,7 +20,7 @@ private:
 #define CONCATENATE(x, y) CONCATENATE_DETAIL(x, y)
 #define MAKE_UNIQUE(x) CONCATENATE(x, __COUNTER__)
 
-#ifdef NDEBUG
+#ifdef NDEBUG1
 #define SCOPED_TIMER(name)
 #else
 #define SCOPED_TIMER(name) Timer MAKE_UNIQUE(timer)(name, __func__)

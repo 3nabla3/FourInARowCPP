@@ -1,28 +1,31 @@
 #pragma once
 
 #include "Board.h"
-#include "Player.h"
+#include "GameEnums.h"
+#include "TreeNode.h"
 
 class MinMax {
 public:
-	MinMax();
-	explicit MinMax(Player playingAs, uint8_t depth = 5);
+	explicit MinMax(Player playingAs = Player::P2, uint8_t depth = 5, Board* gameBoard = nullptr);
 
 	~MinMax() = default;
-	MinMax(const MinMax& other) = default;
-	MinMax(MinMax&& other) noexcept = default;
-	MinMax& operator=(const MinMax& other) = default;
-	MinMax& operator=(MinMax&& other) noexcept = default;
 
 	void SetBoard(Board* board) { m_Board = board; }
+	void GenerateTree();
+	void ShiftTree(Col col);
+	void AddLayer();
 
-	[[nodiscard]] Player PlayingAs() const { return m_playingAs; }
-
+	[[nodiscard]] inline Player PlayingAs() const { return m_playingAs; }
+	[[nodiscard]] inline uint8_t GetMaxDepth() const {return m_maxDepth; }
+	[[nodiscard]] const std::shared_ptr<TreeNode>& GetHead() const { return m_head; }
 	[[nodiscard]] Col GetBestMove() const;
 private:
 	Player m_playingAs;
 	uint8_t m_maxDepth;
 
-	// pointer to the running game
+	// pointer to the running game's board
 	const Board* m_Board = nullptr;
+	std::shared_ptr<TreeNode> m_head;
+
+	static int ChoseRandomChild(const TreeNode** children, int size);
 };

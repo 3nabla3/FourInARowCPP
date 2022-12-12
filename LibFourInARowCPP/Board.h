@@ -16,6 +16,8 @@ class Board {
 public:
 	const static Col N_COLS = 7;
 	const static Row N_ROWS = 6;
+	static constexpr uint8_t GetSize() { return N_COLS * N_ROWS; }
+
 	typedef std::array<BoardPiece, Board::N_COLS * Board::N_ROWS> BoardState;
 
 	// Custom constructor

@@ -9,27 +9,13 @@ Board::Board(const BoardPiece initial_state[]) {
 		Reset();
 }
 
-Board::Board(const Board& other) {
-	DLOG(WARNING) << "Calling Board copy constructor";
-	m_state = other.m_state;
-}
+Board::Board(const Board& other) = default;
 
-Board::Board(Board&& other) noexcept {
-	DLOG(WARNING) << "Calling Board R-value move constructor";
-	m_state = other.m_state;
-}
+Board::Board(Board&& other) noexcept = default;
 
-Board& Board::operator=(const Board& other) {
-	DLOG(WARNING) << "Calling Board copy assignment";
-	m_state = other.m_state;
-	return *this;
-}
+Board& Board::operator=(const Board& other) = default;
 
-Board& Board::operator=(Board&& other) noexcept {
-	DLOG(WARNING) << "Calling Board move assignment";
-	m_state = other.m_state;
-	return *this;
-}
+Board& Board::operator=(Board&& other) noexcept = default;
 
 void Board::Reset() {
 	for (auto& i: m_state)
@@ -38,7 +24,7 @@ void Board::Reset() {
 
 void Board::Reset(const BoardPiece initial_state[]) {
 	// TODO: should this copy? or just get the reference
-	for (int i = 0; i < m_state.size(); i++)
+	for (int i = 0; i < GetSize(); i++)
 		m_state[i] = initial_state[i];
 }
 
@@ -86,6 +72,7 @@ std::vector<BoardPiece> Board::GetCol(Col c) const {
 	return res;
 }
 
+// TODO: should this be a template argument??
 std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
 	int8_t row_i, col_i;
 
@@ -185,4 +172,3 @@ std::ostream& operator<<(std::ostream& out, BoardPiece piece) {
 	}
 	return out;
 }
-

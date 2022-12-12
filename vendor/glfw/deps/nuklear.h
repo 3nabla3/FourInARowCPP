@@ -11035,7 +11035,7 @@ nk_tt_InitFont(struct nk_tt_fontinfo *info, const unsigned char *data2, int font
 
     cmap = nk_tt__find_table(data, (nk_uint)fontstart, "cmap");       /* required */
     info->loca = (int)nk_tt__find_table(data, (nk_uint)fontstart, "loca"); /* required */
-    info->head = (int)nk_tt__find_table(data, (nk_uint)fontstart, "head"); /* required */
+    info->head = (int)nk_tt__find_table(data, (nk_uint)fontstart, "m_head"); /* required */
     info->glyf = (int)nk_tt__find_table(data, (nk_uint)fontstart, "glyf"); /* required */
     info->hhea = (int)nk_tt__find_table(data, (nk_uint)fontstart, "hhea"); /* required */
     info->hmtx = (int)nk_tt__find_table(data, (nk_uint)fontstart, "hmtx"); /* required */

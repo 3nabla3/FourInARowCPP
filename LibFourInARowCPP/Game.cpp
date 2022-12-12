@@ -8,69 +8,45 @@ Game::Game() : m_gameState(GameState::IN_PROGRESS), m_playing(Player::P1) {}
 
 Game::Game(Board&& initial_board) : m_board(std::move(initial_board)), m_gameState(GameState::IN_PROGRESS) {
 	DLOG(WARNING) << "Calling Game with R-value reference of Board";
-	m_playing = GetPlaysNext();
+	m_playing = GetPlaysNext(m_board);
 	UpdateBoardState();
 }
 
-Game::Game(const Game& other) {
+Game::Game(const Game& other)
+		: m_algo(std::make_unique<MinMax>(other.m_algo->PlayingAs(), other.m_algo->GetMaxDepth())),
+		  m_playing(other.m_playing), m_gameState(other.m_gameState), m_board(other.m_board),
+		  m_algoActive(other.m_algoActive) {
 	DLOG(WARNING) << "Calling Game copy constructor";
-	m_playing = other.m_playing;
-	m_gameState = other.m_gameState;
-	m_board = other.m_board;
-	m_algoActive = other.m_algoActive;
-	m_algo = other.m_algo;
 }
 
-Game::Game(Game&& other) noexcept {
+Game::Game(Game&& other) noexcept
+		: m_algo(std::move(other.m_algo)), m_playing(other.m_playing), m_gameState(other.m_gameState),
+		  m_board(std::move(other.m_board)),
+		  m_algoActive(other.m_algoActive) {
 	DLOG(WARNING) << "Calling Game R-value move constructor";
-	m_playing = other.m_playing;
-	m_gameState = other.m_gameState;
-	m_board = std::move(other.m_board);
-	m_algoActive = other.m_algoActive;
-	m_algo = other.m_algo;
 }
 
-Game& Game::operator=(const Game& other) {
-	DLOG(WARNING) << "Calling Game copy operator";
-	m_playing = other.m_playing;
-	m_gameState = other.m_gameState;
-	m_board = other.m_board;
-	m_algoActive = other.m_algoActive;
-	m_algo = other.m_algo;
-	return *this;
-}
-
-Game& Game::operator=(Game&& other) noexcept {
-	DLOG(WARNING) << "Calling Game R-value move assignment";
-	m_playing = other.m_playing;
-	m_gameState = other.m_gameState;
-	m_board = std::move(other.m_board);
-	m_algoActive = other.m_algoActive;
-	m_algo = other.m_algo;
-	return *this;
-}
-
-void Game::AttachAlgo(MinMax mm) {
-	// TODO: optimize to make sure this does not take a copy once mm becomes big
-	m_algo = mm;
+/// Construct a min max algorithm that the game object will own
+void Game::CreateAlgo(Player playAs, uint8_t depth) {
+	m_algo = std::make_unique<MinMax>(playAs, depth);
+	m_algo->SetBoard(&m_board);
 	m_algoActive = true;
-	m_algo.SetBoard(GetBoardPtr());
 }
 
-Player Game::GetPlaysNext() {
-	/// Verify if the board is valid, and then who's turn is it to play
+/// Verify if the board is valid, and then who's turn is it to play
+Player Game::GetPlaysNext(const Board& board) {
 
 	// are there more of P1's or P2's pieces
 	uint8_t balance = 0;
 	for (int i = 0; i < Board::N_COLS * Board::N_ROWS; i++) {
-		if (m_board.GetState()[i] == BoardPiece::P1)
+		if (board.GetState()[i] == BoardPiece::P1)
 			balance++;
-		else if (m_board.GetState()[i] == BoardPiece::P2)
+		else if (board.GetState()[i] == BoardPiece::P2)
 			balance--;
 	}
 
 	// otherwise the board is not valid
-	LOG_IF(FATAL, balance != 0 && balance != 1) << "The board is not balanced: " << std::to_string(balance);
+	LOG_IF(FATAL, balance != 0 && balance != 1) << "The board is invalid: balance is " << std::to_string(balance);
 
 	if (balance == 0) // if each player has the same amount of pieces
 		return Player::P1;
@@ -78,22 +54,46 @@ Player Game::GetPlaysNext() {
 		return Player::P2;
 }
 
+void Game::AlgoPlayTurn() {
+	/// Carry out the steps the algorithm must play on its turn
+
+	// if the human played before the algo,
+	// shift the algo's tree to reflect that
+	if (m_lastPlay) {
+		m_algo->ShiftTree(m_lastPlay.value());
+		m_algo->AddLayer();
+	}
+
+	uint32_t theoCount = TreeNode::NumNodesInFullTree(Board::N_COLS, m_algo->GetMaxDepth());
+	DLOG(INFO) << "Number of theoretical nodes:\t" << theoCount;
+	uint32_t actualCount = m_algo->GetHead()->GetNumNodes();
+	DLOG(INFO) << "Number of actual nodes:\t" << actualCount;
+
+	auto col = m_algo->GetBestMove();
+	Play(col);
+	m_algo->ShiftTree(col);
+	m_algo->AddLayer();
+}
+
 void Game::AlgoWorkerFunc() {
 	using namespace std::chrono_literals;
+	// TODO: is is possible that the if condition is false?
+	// if the tree has not been generated yet
+	if (!m_algo->GetHead())
+		m_algo->GenerateTree();
 
 	while (m_algoActive) {
-		if (m_playing == m_algo.PlayingAs() && !IsGameOver()) {
-			auto col = m_algo.GetBestMove();
-			Play(col);
+		if (m_playing == m_algo->PlayingAs() && !IsGameOver()) {
+			AlgoPlayTurn();
 		}
+		// avoid overusing cpu
 		std::this_thread::sleep_for(500ms);
 	}
 }
 
 void Game::Start() {
-	DLOG(INFO) << "Creating algo thread";
+	DLOG(INFO) << "Launching MinMax worker thread...";
 	m_algoThread = std::thread(&Game::AlgoWorkerFunc, this);
-	DLOG(INFO) << "Algo thread has been created";
 }
 
 void Game::End() {
@@ -103,22 +103,9 @@ void Game::End() {
 	DLOG(INFO) << "Algo thread has joined";
 }
 
-static BoardPiece ToPiece(Player p) {
-	/// converts a player to its corresponding piece
-	switch (p) {
-		case Player::P1:
-			return BoardPiece::P1;
-		case Player::P2:
-			return BoardPiece::P2;
-		default: // only happens if p is uninitialized
-			return BoardPiece::EMPTY;
-	}
-}
-
+/// Let a user place a piece and update the state.
+///  Return a reference to itself to allow method chaining
 Game& Game::Play(Col col) {
-	/// Let a user place a piece and update the state.
-	///  Return a reference to itself to allow method chaining
-
 	if (IsGameOver()) {
 		LOG(ERROR) << "Game is over!";
 		return *this;
@@ -142,7 +129,7 @@ Game& Game::Play(Col col) {
 
 void Game::UpdateBoardState() {
 	// if there is an alignment
-	if (auto alignment = Get4InARow()) {
+	if (auto alignment = Get4InARow(m_board)) {
 		auto [player, coords] = alignment.value();
 		if (player == Player::P1) m_gameState = GameState::P1_WON;
 		else if (player == Player::P2) m_gameState = GameState::P2_WON;
@@ -152,16 +139,26 @@ void Game::UpdateBoardState() {
 		m_gameState = GameState::TIE;
 }
 
+GameState Game::AnalyzeGameState(const Board& board) {
+	if (auto alignment = Get4InARow(board)) {
+		auto [player, coords] = alignment.value();
+		if (player == Player::P1) return GameState::P1_WON;
+		if (player == Player::P2) return GameState::P2_WON;
+	} else if (board.GetValidColumns().empty())
+		return GameState::TIE;
+
+	return GameState::IN_PROGRESS;
+}
+
 void Game::SwitchPlayer() {
 	int temp = static_cast<int>(m_playing) + 1;
 	m_playing = static_cast<Player>(temp % 2);
 }
 
+/// check if the line has a 4 in a row, and return the index if yes
 static int8_t GetIndex4InARow(const std::vector<BoardPiece>& line, Player player) {
-	/// check if the line has a 4 in a row, and return the index if yes
-
 	uint8_t count = 0;
-	BoardPiece player_piece = ToPiece(player);
+	BoardPiece player_piece = Game::ToPiece(player);
 	for (int i = 0; i < line.size(); i++) {
 		if (line[i] == player_piece) {
 			count++;
@@ -174,9 +171,8 @@ static int8_t GetIndex4InARow(const std::vector<BoardPiece>& line, Player player
 	return -1;
 }
 
+/// check if there is an alignment in the single row
 static optional<Alignment> CheckSingleRow(const std::vector<BoardPiece>& row, Player player, Row row_i) {
-	/// check if there is an alignment in the single row
-
 	// if there is an alignment in the column
 	int8_t idx = GetIndex4InARow(row, player);
 	if (idx >= 0) {
@@ -188,9 +184,8 @@ static optional<Alignment> CheckSingleRow(const std::vector<BoardPiece>& row, Pl
 	return {};
 }
 
+/// check all row and all players
 static optional<pair<Player, Alignment>> CheckRows(const Board& board) {
-	/// check all row and all players
-
 	Player players[] = {Player::P1, Player::P2};
 
 	for (int row_i = 0; row_i < Board::N_ROWS; row_i++) {
@@ -205,9 +200,8 @@ static optional<pair<Player, Alignment>> CheckRows(const Board& board) {
 	return {};
 }
 
+/// check if there is an alignment in the single column
 static optional<Alignment> CheckSingleCol(const vector<BoardPiece>& col, Player player, Col col_i) {
-	/// check if there is an alignment in the single column
-
 	// if there is an alignment in the column
 	int8_t idx = GetIndex4InARow(col, player);
 	if (idx >= 0) {
@@ -220,9 +214,8 @@ static optional<Alignment> CheckSingleCol(const vector<BoardPiece>& col, Player 
 	return {};
 }
 
+/// check all columns
 static optional<pair<Player, Alignment>> CheckColumns(const Board& board) {
-	/// check all columns
-
 	Player players[] = {Player::P1, Player::P2};
 
 	for (int col_i = 0; col_i < Board::N_COLS; col_i++) {
@@ -256,9 +249,8 @@ static optional<Alignment> CheckSingleUpDiag(const vector<BoardPiece>& diag, Pla
 	return {};
 }
 
+/// check all up diags
 static optional<pair<Player, Alignment>> CheckUpDiag(const Board& board) {
-	/// check all up diags
-
 	Player players[] = {Player::P1, Player::P2};
 
 	for (int up_diag_i = 0; up_diag_i < Board::N_COLS + Board::N_ROWS - 1; up_diag_i++) {
@@ -294,9 +286,8 @@ static optional<Alignment> CheckSingleDnDiag(const vector<BoardPiece>& diag, Pla
 	return {};
 }
 
+/// check all down diags
 static optional<pair<Player, Alignment>> CheckDnDiag(const Board& board) {
-	/// check all down diags
-
 	Player players[] = {Player::P1, Player::P2};
 
 	for (int dn_diag_i = 0; dn_diag_i < Board::N_COLS + Board::N_ROWS - 1; dn_diag_i++) {
@@ -311,28 +302,28 @@ static optional<pair<Player, Alignment>> CheckDnDiag(const Board& board) {
 	return {};
 }
 
-optional<pair<Player, Alignment>> Game::Get4InARow() const {
+optional<pair<Player, Alignment>> Game::Get4InARow(const Board& board) {
 	// check the rows
-	if (auto alignment = CheckRows(m_board)) {
-		DLOG(INFO) << "Found alignment in row";
+	if (auto alignment = CheckRows(board)) {
+		// DLOG(INFO) << "Found alignment in row";
 		return alignment;
 	}
 
 	// check the columns
-	if (auto alignment = CheckColumns(m_board)) {
-		DLOG(INFO) << "Found alignment in column";
+	if (auto alignment = CheckColumns(board)) {
+		// DLOG(INFO) << "Found alignment in column";
 		return alignment;
 	}
 
 	// check up diag
-	if (auto alignment = CheckUpDiag(m_board)) {
-		DLOG(INFO) << "Found alignment in up diag";
+	if (auto alignment = CheckUpDiag(board)) {
+		// DLOG(INFO) << "Found alignment in up diag";
 		return alignment;
 	}
 
 	// check down diag
-	if (auto alignment = CheckDnDiag(m_board)) {
-		DLOG(INFO) << "Found alignment in down diag";
+	if (auto alignment = CheckDnDiag(board)) {
+		// DLOG(INFO) << "Found alignment in down diag";
 		return alignment;
 	}
 
