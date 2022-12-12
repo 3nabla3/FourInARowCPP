@@ -235,7 +235,7 @@ static optional<Alignment> CheckSingleUpDiag(const vector<BoardPiece>& diag, Pla
 		Alignment array;
 		uint8_t x, y;
 		if (up_diag_i < Board::N_ROWS) {
-			y = up_diag_i - 1;
+			y = up_diag_i - idx;
 			x = idx;
 		} else {
 			y = Board::N_ROWS - idx - 1;
