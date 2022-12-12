@@ -16,13 +16,17 @@
 #include <cmath>
 #include <numbers>
 #include <algorithm>
+#include <limits>
+#include <random>
+#include <chrono>
 
-#ifdef __linux__
-	// #include <bits/stdc++.h>  // apparently, this is needed to iterate over vectors
-#else 
-	#ifdef WIN32
-		#include <Windows.h>
-	#endif
+
+
+#if defined(__linux__)
+	#include <bits/stdc++.h>  // apparently, this is needed to iterate over vectors
+#elif defined(WIN32)
+	#include <Windows.h>
 #endif
 
 #include "glog/logging.h"
+#include "Timer.h"

@@ -659,7 +659,7 @@ This check fails with the following error message.
 
 ::
 
-   F0825 185142 test.cc:22] Check failed: write(1, NULL, 2) >= 0 Write NULL failed: Bad address [14]
+   F0825 185142 test.cc:22] CheckDirection failed: write(1, NULL, 2) >= 0 Write NULL failed: Bad address [14]
 
 Syslog
 ~~~~~~

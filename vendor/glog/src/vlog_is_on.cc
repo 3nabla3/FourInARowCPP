@@ -118,7 +118,7 @@ struct VModuleInfo {
 
 // This protects the following global variables.
 static Mutex vmodule_lock;
-// Pointer to head of the VModuleInfo list.
+// Pointer to m_head of the VModuleInfo list.
 // It's a map from module pattern to logging level for those module(s).
 static VModuleInfo* vmodule_list = 0;
 static SiteFlag* cached_site_list = 0;
@@ -155,7 +155,7 @@ static void VLOG2Initializer() {
     if (vmodule == NULL) break;
     vmodule++;  // Skip past ","
   }
-  if (head) {  // Put them into the list at the head:
+  if (head) {  // Put them into the list at the m_head:
     tail->next = vmodule_list;
     vmodule_list = head;
   }

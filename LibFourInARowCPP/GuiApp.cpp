@@ -1,22 +1,20 @@
 #include "pch.h"
 #include "GuiApp.h"
 
-#include <utility>
-
+/// used to pass a buffer of data to the glfw callback functions
 struct UserInfo {
-	/// used to pass a buffer of data to the glfw callback functions
 	GuiApp* gui;
 };
 
 
 GuiApp::GuiApp(Game& game, uint16_t width, uint16_t height)
 		: m_Game(&game), m_Width(width), m_Height(height) {
-	DLOG(INFO) << "Attempting to initialize window, please wait...";
+	DLOG(INFO) << "Initializing window...";
 	if (!glfwInit())
 		LOG(FATAL) << "Could not initialize glfw!";
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	m_Window = glfwCreateWindow(m_Width, m_Height, "Hello World", nullptr, nullptr);
+	m_Window = glfwCreateWindow(m_Width, m_Height, "Unbeatable? Four in a Row!", nullptr, nullptr);
 	if (!m_Window) {
 		glfwTerminate();
 		LOG(FATAL) << "Could not create window!";
@@ -28,7 +26,7 @@ GuiApp::GuiApp(Game& game, uint16_t width, uint16_t height)
 		LOG(FATAL) << "Failed to initialize GLAD";
 	}
 
-	/// set the user info that will be used during callbacks
+	// set the user info that will be used during callbacks
 	auto* userinfo = new UserInfo();
 	userinfo->gui = this;
 	glfwSetWindowUserPointer(m_Window, userinfo);
@@ -36,7 +34,7 @@ GuiApp::GuiApp(Game& game, uint16_t width, uint16_t height)
 	glfwSetKeyCallback(m_Window, KeyCallback);
 	glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
 
-	DLOG(INFO) << "Completed windows initialization!";
+	DLOG(INFO) << "Finished initializing window";
 }
 
 GuiApp::~GuiApp() {
@@ -67,8 +65,8 @@ void GuiApp::Run() {
 	m_Game->End();
 }
 
+/// converts from a [0, 1] * [0, 1] space to a [-1, 1] * [-1, 1] space
 void GuiApp::Vertex(float x, float y) {
-	/// converts from a [0, 1] * [0, 1] space to a [-1, 1] * [-1, 1] space
 	glVertex2f(x * 2 - 1, y * 2 - 1);
 }
 
@@ -146,8 +144,8 @@ void GuiApp::RenderPiece(BoardPiece piece, Row row, Col col) const {
 void GuiApp::RenderCircle(float x, float y, float r) {
 	// how many edges on the circle:
 	// the more, the softer the circle but the more expensive the draw
-
 	int steps = 15;
+
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < steps; i++) {
 		auto angle_theta = (float) ((double) i * std::numbers::pi) / ((float) steps / 2.f);

@@ -56,7 +56,7 @@
 # if BOOST_PP_CONFIG_FLAGS() & BOOST_PP_CONFIG_BCC()
 #    define BOOST_PP_LIST_IS_CONS(list) BOOST_PP_LIST_IS_CONS_D(list)
 #    define BOOST_PP_LIST_IS_CONS_D(list) BOOST_PP_LIST_IS_CONS_ ## list
-#    define BOOST_PP_LIST_IS_CONS_(head, tail) 1
+#    define BOOST_PP_LIST_IS_CONS_(m_head, tail) 1
 #    define BOOST_PP_LIST_IS_CONS_BOOST_PP_NIL 0
 # else
 #    define BOOST_PP_LIST_IS_CONS(list) BOOST_PP_IS_BINARY(list)
