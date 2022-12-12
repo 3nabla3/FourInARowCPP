@@ -38,6 +38,7 @@ Col MinMax::GetBestMove() const {
 	const TreeNode* bestChildren[m_head->GetChildren().size()];
 	int idx = 0;
 
+	LOG(INFO) << "------------------------------------";
 	if (maximizing)
 		LOG(INFO) << "Calculated scores: higher is better for MinMax";
 	else
@@ -69,6 +70,7 @@ Col MinMax::GetBestMove() const {
 
 	Col bestMove = bestChildren[chosenIdx]->GetDelta();
 	LOG(INFO) << "Chosen move: " << std::to_string(bestMove);
+	LOG(INFO) << "------------------------------------";
 
 	return bestMove;
 }

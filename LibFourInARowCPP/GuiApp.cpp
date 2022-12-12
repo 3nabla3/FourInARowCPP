@@ -47,7 +47,8 @@ GuiApp::~GuiApp() {
 void GuiApp::Run() {
 	using namespace std::literals::chrono_literals;
 
-	m_Game->Start();
+	if (m_Game->HasAlgo())
+		m_Game->Start();
 
 	DLOG(INFO) << "Starting main loop";
 	while (!glfwWindowShouldClose(m_Window)) {

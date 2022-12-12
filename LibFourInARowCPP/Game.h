@@ -21,6 +21,7 @@ public:
 
 	void SwitchPlayer();
 	void CreateAlgo(Player playAs, uint8_t depth);
+	[[nodiscard]] bool HasAlgo() const { return m_algoActive; }
 
 	[[nodiscard]] Player Playing() const { return m_playing; }
 
@@ -55,13 +56,17 @@ private:
 	// used to know whether the algo was default constructed 
 	// at compile time or attached by the user
 	bool m_algoActive = false;
+
 	std::unique_ptr<MinMax> m_algo;
+	std::unique_ptr<MinMax> m_algoSecond;
+
 	std::thread m_algoThread;
+	std::thread m_algoSecondThread;
 
 	std::optional<Col> m_lastPlay; // the last column to be played, empty before first move
 	std::optional<Alignment> m_alignment{};
 
 	void UpdateBoardState();
-	void AlgoWorkerFunc();
-	void AlgoPlayTurn();
+	void AlgoWorkerFunc(bool primary=true);
+	void AlgoPlayTurn(bool primary=true);
 };

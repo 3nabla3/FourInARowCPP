@@ -41,7 +41,8 @@ int main([[maybe_unused]] int argc, char** argv) {
 
 	// Game game((Board(initial)));
 	Game game;
-	game.CreateAlgo(Player::P2, 5);
+	game.CreateAlgo(Player::P1, 3);
+	game.CreateAlgo(Player::P2, 3);
 
 	GuiApp gui(game);
 	gui.Run();

@@ -28,8 +28,17 @@ Game::Game(Game&& other) noexcept
 
 /// Construct a min max algorithm that the game object will own
 void Game::CreateAlgo(Player playAs, uint8_t depth) {
-	m_algo = std::make_unique<MinMax>(playAs, depth);
-	m_algo->SetBoard(&m_board);
+	// if the primary algo is not already set
+	if (!m_algo) {
+		m_algo = std::make_unique<MinMax>(playAs, depth);
+		m_algo->SetBoard(&m_board);
+	}
+	// if it is set, use the secondary algo
+	else {
+		m_algoSecond = std::make_unique<MinMax>(playAs, depth);
+		m_algoSecond->SetBoard(&m_board);
+	}
+	// mark the algos as active
 	m_algoActive = true;
 }
 
@@ -54,38 +63,46 @@ Player Game::GetPlaysNext(const Board& board) {
 		return Player::P2;
 }
 
-void Game::AlgoPlayTurn() {
+void Game::AlgoPlayTurn(bool primary) {
 	/// Carry out the steps the algorithm must play on its turn
+	auto& algo = primary ? m_algo : m_algoSecond;
 
 	// if the human played before the algo,
 	// shift the algo's tree to reflect that
 	if (m_lastPlay) {
-		m_algo->ShiftTree(m_lastPlay.value());
-		m_algo->AddLayer();
+		algo->ShiftTree(m_lastPlay.value());
+		algo->AddLayer();
 	}
 
-	uint32_t theoCount = TreeNode::NumNodesInFullTree(Board::N_COLS, m_algo->GetMaxDepth());
+	uint32_t theoCount = TreeNode::NumNodesInFullTree(Board::N_COLS, algo->GetMaxDepth());
 	DLOG(INFO) << "Number of theoretical nodes:\t" << theoCount;
-	uint32_t actualCount = m_algo->GetHead()->GetNumNodes();
+	uint32_t actualCount = algo->GetHead()->GetNumNodes();
 	DLOG(INFO) << "Number of actual nodes:\t" << actualCount;
 
-	auto col = m_algo->GetBestMove();
+	auto col = algo->GetBestMove();
 	Play(col);
-	m_algo->ShiftTree(col);
-	m_algo->AddLayer();
+	algo->ShiftTree(col);
+	algo->AddLayer();
 }
 
-void Game::AlgoWorkerFunc() {
+static std::mutex mutex;
+
+void Game::AlgoWorkerFunc(bool primary) {
+	auto& algo = primary ? m_algo : m_algoSecond;
+
 	using namespace std::chrono_literals;
 	// TODO: is is possible that the if condition is false?
 	// if the tree has not been generated yet
-	if (!m_algo->GetHead())
-		m_algo->GenerateTree();
+	if (!algo->GetHead())
+		algo->GenerateTree();
 
 	while (m_algoActive) {
-		if (m_playing == m_algo->PlayingAs() && !IsGameOver()) {
-			AlgoPlayTurn();
+		if (m_playing == algo->PlayingAs() && !IsGameOver()) {
+			mutex.lock();
+			AlgoPlayTurn(primary);
+			mutex.unlock();
 		}
+
 		// avoid overusing cpu
 		std::this_thread::sleep_for(500ms);
 	}
@@ -93,13 +110,19 @@ void Game::AlgoWorkerFunc() {
 
 void Game::Start() {
 	DLOG(INFO) << "Launching MinMax worker thread...";
-	m_algoThread = std::thread(&Game::AlgoWorkerFunc, this);
+	m_algoThread = std::thread(&Game::AlgoWorkerFunc, this, true);
+	if (m_algoSecond)
+		m_algoSecondThread = std::thread(&Game::AlgoWorkerFunc, this, false);
 }
 
 void Game::End() {
 	// ensures the thread stops
-	m_algoActive = false;
-	m_algoThread.join();
+	if (m_algoActive) {
+		m_algoActive = false;
+		m_algoThread.join();
+		if (m_algoSecond)
+			m_algoSecondThread.join();
+	}
 	DLOG(INFO) << "Algo thread has joined";
 }
 
