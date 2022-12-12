@@ -33,10 +33,10 @@ public:
 	void UpdateTree();
 
 	static uint32_t NumNodesInFullTree(int nPerLayer, int depth);
-	std::vector<std::shared_ptr<TreeNode>> m_Children;
 private:
 	const Board m_Board;
 	const bool m_IsMaximizing;
+	std::vector<std::shared_ptr<TreeNode>> m_Children;
 
 	// Act as a cache for their respective "Get" methods
 	// Should be reset appropriately to allow recalculation
