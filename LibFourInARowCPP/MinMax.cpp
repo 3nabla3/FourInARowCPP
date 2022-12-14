@@ -27,7 +27,7 @@ void MinMax::AddLayer() {
 /// Shift the new head of the tree to be one of its children
 void MinMax::ShiftTree(Col col) {
 	std::shared_ptr<TreeNode>& newHead = m_head->GetChildFromDelta(col);
-	m_head.swap(newHead);
+	m_head = newHead;
 }
 
 Col MinMax::GetBestMove() const {
