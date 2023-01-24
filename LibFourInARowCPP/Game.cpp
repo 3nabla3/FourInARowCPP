@@ -11,20 +11,6 @@ Game::Game(Board&& initial_board) : m_board(std::move(initial_board)), m_gameSta
 	UpdateBoardState();
 }
 
-//Game::Game(const Game& other)
-//		: m_algoP1(std::make_unique<MinMax>(other.m_algoP1->PlayingAs(), other.m_algoP1->GetMaxDepth())),
-//          m_playing(other.m_playing), m_gameState(other.m_gameState), m_board(other.m_board),
-//          m_algoActive(other.m_algoActive) {
-//	DLOG(WARNING) << "Calling Game copy constructor";
-//}
-//
-//Game::Game(Game&& other) noexcept
-//		: m_algoP1(std::move(other.m_algoP1)), m_playing(other.m_playing), m_gameState(other.m_gameState),
-//          m_board(std::move(other.m_board)),
-//          m_algoActive(other.m_algoActive) {
-//	DLOG(WARNING) << "Calling Game R-value move constructor";
-//}
-
 /// Construct a min max algorithm that the game object will own
 void Game::CreateAlgo(Player playAs, uint8_t depth) {
 	if (playAs == Player::P1) {
@@ -69,6 +55,8 @@ Player Game::GetPlaysNext(const Board& board) {
 		return Player::P2;
 }
 
+static std::mutex mutex;
+
 void Game::AlgoPlayTurn(Player player) {
 	/// Carry out the steps the algorithm must play on its turn
 	auto& algo = player == Player::P1 ? m_algoP1 : m_algoP2;
@@ -82,12 +70,13 @@ void Game::AlgoPlayTurn(Player player) {
 	}
 
 	auto col = algo->GetBestMove();
+
+	mutex.lock();
 	Play(col);
+	mutex.unlock();
 	algo->ShiftTree(col);
 	algo->AddLayer();
 }
-
-static std::mutex mutex;
 
 void Game::AlgoWorkerFunc(Player player) {
 	auto& algo = player == Player::P1 ? m_algoP1 : m_algoP2;
@@ -102,9 +91,7 @@ void Game::AlgoWorkerFunc(Player player) {
 
 	while (!IsGameOver()) {
 		if (m_playing == algo->PlayingAs()) {
-			mutex.lock();
 			AlgoPlayTurn(player);
-			mutex.unlock();
 		}
 
 		// avoid overusing cpu
@@ -148,13 +135,15 @@ Game& Game::Play(Col col) {
 	if (!m_board.InsertPiece(col, ToPiece(m_playing)))
 		return *this;
 
+	// TODO: refactor this to make it more readable
 	if (num_valid_cols != m_board.GetValidColumns().size()) {
-		LOG(INFO) << "New Empty column, adding two layers to algo";
 		if (m_algoP1) {
-			m_algoP1->AddLayer(2);
+			LOG(INFO) << "New Empty column, adding a layer to algo 1";
+			m_algoP1->AddLayer();
 		}
 		if (m_algoP2) {
-			m_algoP2->AddLayer(2);
+			LOG(INFO) << "New Empty column, adding a layer to algo 2";
+			m_algoP2->AddLayer();
 		}
 	}
 

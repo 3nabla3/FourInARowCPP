@@ -27,16 +27,17 @@ int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
-	std::string initialString = "\t\t\t\t\t\t\n"
-								"\t\t\t\t\t\t\n"
-								"\t\to\t\to\t\t\n"
-								"\to\to\t\tx\t\t\n"
-								"\tx\tx\t\tx\t\t\n"
-								"\to\to\t\tx\tx\t";
-	std::unique_ptr<BoardPiece[]> initial(ArrayFromString(initialString));
+//	std::string initialString = "\t\t\t\t\t\t\n"
+//								"\t\t\t\t\t\t\n"
+//								"\t\to\t\to\t\t\n"
+//								"\to\to\t\tx\t\t\n"
+//								"\tx\tx\t\tx\t\t\n"
+//								"\to\to\t\tx\tx\t";
+//	std::unique_ptr<BoardPiece[]> initial(ArrayFromString(initialString));
 
-	Game game((Board(initial.get())));
-	game.CreateAlgo(Player::P2, 7);
+//	Game game((Board(initial.get())));
+	Game game;
+	game.CreateAlgo(Player::P2, 3);
 
 	GuiApp gui(game);
 	gui.Run();
