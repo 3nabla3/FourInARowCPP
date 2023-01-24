@@ -21,7 +21,7 @@ public:
 
 	[[nodiscard]] inline Col GetDelta() const { return m_delta; }
 
-	[[nodiscard]] Score GetScore(uint8_t depth) const;
+	[[nodiscard]] Score GetScore() const;
 	[[nodiscard]] GameState GetGameState() const;
 	[[nodiscard]] uint32_t GetNumNodes() const;
 
@@ -30,7 +30,7 @@ public:
 	[[nodiscard]] std::shared_ptr<TreeNode>& GetChildFromDelta(uint8_t index);
 
 	void GenerateTree(uint8_t depth);
-	void UpdateTree();
+	void AddLayer();
 
 	static uint32_t NumNodesInFullTree(int nPerLayer, int depth);
 private:
@@ -48,7 +48,7 @@ private:
 
 	[[nodiscard]] bool IsLeaf() const { return m_Children.empty(); }
 
-	[[nodiscard]] Score MinMax(uint8_t depth, Score alpha, Score beta) const;
+	[[nodiscard]] Score MinMax(Score alpha, Score beta) const;
 	[[nodiscard]] Score CalculateStaticScore() const;
 	[[nodiscard]] Score CalculateStaticPlayerScore(Player player) const;
 	static Score AnalyzeLine_Impl(std::vector<BoardPiece>::const_iterator begin,

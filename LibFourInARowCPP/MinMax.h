@@ -13,7 +13,7 @@ public:
 	void SetBoard(Board* board) { m_Board = board; }
 	void GenerateTree();
 	void ShiftTree(Col col);
-	void AddLayer();
+	void AddLayer(int count=1);
 
 	[[nodiscard]] inline Player PlayingAs() const { return m_playingAs; }
 	[[nodiscard]] inline uint8_t GetMaxDepth() const {return m_maxDepth; }

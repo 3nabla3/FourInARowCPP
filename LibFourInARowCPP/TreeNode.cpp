@@ -6,9 +6,9 @@ TreeNode::TreeNode(Board board, bool isMaximizing, Col delta)
 		: m_Board(std::move(board)), m_IsMaximizing(isMaximizing), m_delta(delta) {
 }
 
-Score TreeNode::GetScore(uint8_t depth) const {
+Score TreeNode::GetScore() const {
 	if (!m_Score)
-		m_Score = MinMax(depth, std::numeric_limits<Score>::min(), std::numeric_limits<Score>::max());
+		m_Score = MinMax(std::numeric_limits<Score>::min(), std::numeric_limits<Score>::max());
 	return m_Score.value();
 }
 
@@ -43,7 +43,7 @@ uint32_t TreeNode::NumNodesInFullTree(int nPerLayer, int depth) {
 }
 
 
-void TreeNode::UpdateTree() {
+void TreeNode::AddLayer() {
 	/// Add a layer to all the IN_PROGRESS leave nodes
 	/// to update the tree from the last play
 
@@ -52,7 +52,7 @@ void TreeNode::UpdateTree() {
 
 	// loop will not execute if the node is a leaf, no need for if statement
 	for (const auto& child : m_Children)
-			child->UpdateTree();
+		child->AddLayer();
 
 	// only extend the branches that are not game over
 	if (IsLeaf() && GetGameState() == GameState::IN_PROGRESS)
@@ -76,16 +76,18 @@ void TreeNode::GenerateTree(uint8_t depth) {
 	}
 }
 
-Score TreeNode::MinMax(uint8_t depth, Score alpha, Score beta) const {
+Score TreeNode::MinMax(Score alpha, Score beta) const {
 	/// https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
 
-	if (depth == 0 || IsLeaf())
+	if (IsLeaf())
 		return CalculateStaticScore();
 
 	if (m_IsMaximizing) {
 		Score bestVal = std::numeric_limits<Score>::min();
 		for (const auto& child: m_Children) {
-			Score value = child->MinMax(depth - 1, alpha, beta);
+			Score value = child->MinMax(alpha, beta);
+//            child->m_Score = value;
+
 			bestVal = std::max(bestVal, value);
 			alpha = std::max(alpha, bestVal);
 			if (beta <= alpha)
@@ -96,7 +98,9 @@ Score TreeNode::MinMax(uint8_t depth, Score alpha, Score beta) const {
 	else {
 		Score bestVal = std::numeric_limits<Score>::max();
 		for (const auto& child: m_Children) {
-			Score value = child->MinMax(depth - 1, alpha, beta);
+			Score value = child->MinMax(alpha, beta);
+//            child->m_Score = value;
+
 			bestVal = std::min(bestVal, value);
 			beta = std::min(beta, bestVal);
 			if (beta <= alpha)
@@ -117,12 +121,14 @@ Score TreeNode::CalculateStaticScore() const {
 ///  Simply analyzes each line of the given generation function and keeps track of the longestLength;
 #define CheckDirection(genFn, maxIdx) \
 for (uint8_t idx = 0; idx < (maxIdx); idx++) { \
-    std::vector<BoardPiece> line = genFn(idx); \
-    int8_t length = AnalyzeLine(line, player); \
-    longestLength = std::max(longestLength, length); \
+	std::vector<BoardPiece> line = genFn(idx); \
+	int8_t length = AnalyzeLine(line, player); \
+	longestLength = std::max(longestLength, length); \
 }
 
 Score TreeNode::CalculateStaticPlayerScore(Player player) const {
+	// TODO: improve the static analysis to make sure the algorithm gets a more
+	//  detailed view of the game
 	int8_t longestLength = 0;
 
 	CheckDirection(m_Board.GetRow, Board::N_ROWS)

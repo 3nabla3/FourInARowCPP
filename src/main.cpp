@@ -5,44 +5,38 @@
 #include "Game.h"
 #include "GuiApp.h"
 
-// static uint8_t GetColumnFromUser(const Board& board) {
-// 	std::vector<Col> cols = board.GetValidColumns();
-//
-// 	while (true) {
-// 		std::string inp;
-// 		DLOG(INFO) << "Enter a column: ";
-// 		std::cin >> inp;
-// 		int col = stoi(inp);
-//
-// 		if (std::find(cols.begin(), cols.end(), col) != cols.end())
-// 			return col;
-// 		else {
-// 			DLOG(WARNING) << "Column " << col << " is invalid";
-// 		}
-// 	}
-// }
+static BoardPiece* ArrayFromString(const std::string& initialString) {
+	auto* array = new BoardPiece[Board::N_COLS * Board::N_ROWS];
+	for (int i = 0; i < Board::N_COLS * Board::N_ROWS; i++)
+		array[i] = BoardPiece::EMPTY;
+
+
+	int idx = 0;
+	for (const char c : initialString) {
+		if (c == '\t' || c == '\n') idx++;
+		else if (c == 'x') array[idx] = BoardPiece::P1;
+		else if (c == 'o') array[idx] = BoardPiece::P2;
+		else
+			LOG(FATAL) << "Invalid character in string";
+	}
+
+	return array;
+}
 
 int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
-	using BoardPiece::EMPTY;
-	using BoardPiece::P1;
-	using BoardPiece::P2;
+	std::string initialString = "\t\t\t\t\t\t\n"
+								"\t\t\t\t\t\t\n"
+								"\t\to\t\to\t\t\n"
+								"\to\to\t\tx\t\t\n"
+								"\tx\tx\t\tx\t\t\n"
+								"\to\to\t\tx\tx\t";
+	std::unique_ptr<BoardPiece[]> initial(ArrayFromString(initialString));
 
-	// BoardPiece initial[Board::N_COLS * Board::N_ROWS] = {
-	// 		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,
-	// 		EMPTY,	EMPTY,	EMPTY,	P2,		EMPTY,	EMPTY,	EMPTY,
-	// 		EMPTY,	EMPTY,	EMPTY,	P2,		EMPTY,	EMPTY,	EMPTY,
-	// 		EMPTY,	EMPTY,	EMPTY,	P1,		EMPTY,	EMPTY,	EMPTY,
-	// 		EMPTY,	EMPTY,	P1,		P1,		EMPTY,	EMPTY,	EMPTY,
-	// 		P2,		P2,		P1,		P1,		EMPTY,	EMPTY,	P2,
-	// };
-
-	// Game game((Board(initial)));
-	Game game;
-	game.CreateAlgo(Player::P1, 3);
-	game.CreateAlgo(Player::P2, 3);
+	Game game((Board(initial.get())));
+	game.CreateAlgo(Player::P2, 7);
 
 	GuiApp gui(game);
 	gui.Run();

@@ -24,5 +24,5 @@ BOOST_AUTO_TEST_CASE(test_AnalyzeLine) {
 	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({EMPTY,	P1,		EMPTY,	P1,		P1,		EMPTY},	Player::P1), 3);
 	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({EMPTY,	P1,		EMPTY,	P1,		P1,		P2},	Player::P1), 3);
 	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({P1,		EMPTY,	P1,		EMPTY,	P1,		P2},	Player::P1), 2);
-	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({P1,		P2,		P1,		P2,		P1,		P2},	Player::P1), 0);
+	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({P1,		P1,		EMPTY,	P1,		P1,		EMPTY},	Player::P1), 3);
 }

@@ -72,7 +72,6 @@ std::vector<BoardPiece> Board::GetCol(Col c) const {
 	return res;
 }
 
-// TODO: should this be a template argument??
 std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
 	int8_t row_i, col_i;
 
@@ -83,7 +82,6 @@ std::vector<BoardPiece> Board::GetUpDiag(uint8_t diag_i) const {
 		row_i = Board::N_ROWS - 1;
 		col_i = (int8_t) (diag_i - Board::N_ROWS + 1);
 	}
-	// TODO: Find the size of the generated diag to optimize
 	std::vector<BoardPiece> res;
 	while (row_i >= 0 && col_i < Board::N_COLS) {
 		res.push_back(GetPiece(row_i, col_i));
@@ -104,7 +102,6 @@ std::vector<BoardPiece> Board::GetDnDiag(uint8_t diag_i) const {
 		row_i = 0;
 		col_i = (int8_t) (diag_i - Board::N_ROWS + 1);
 	}
-	// TODO: Find the size of the generated diag to optimize
 	std::vector<BoardPiece> res;
 	while (row_i < Board::N_ROWS && col_i < Board::N_COLS) {
 		res.push_back(GetPiece(row_i, col_i));

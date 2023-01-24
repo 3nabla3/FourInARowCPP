@@ -47,8 +47,7 @@ GuiApp::~GuiApp() {
 void GuiApp::Run() {
 	using namespace std::literals::chrono_literals;
 
-	if (m_Game->HasAlgo())
-		m_Game->Start();
+	m_Game->Start();
 
 	DLOG(INFO) << "Starting main loop";
 	while (!glfwWindowShouldClose(m_Window)) {
@@ -191,7 +190,8 @@ void GuiApp::KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scanc
 	if (action == GLFW_PRESS) {
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
 		key -= 0x30; // convert the ascii char into the actual int value;
-		ui.gui->Play(key);
+		if (ui.gui->m_Game->CanAcceptInput())
+			ui.gui->Play(key);
 	}
 }
 
@@ -200,7 +200,8 @@ void GuiApp::MouseButtonCallback(GLFWwindow* window, int button, int action, [[m
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
-		if (auto col = ui.gui->ConvertGLFWposToColumn(x))
+		auto col = ui.gui->ConvertGLFWposToColumn(x);
+		if (col && ui.gui->m_Game->CanAcceptInput())
 			ui.gui->Play(col.value());
 	}
 }

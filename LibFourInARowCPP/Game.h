@@ -11,8 +11,8 @@ public:
 	explicit Game(Board&& initial_board);
 
 	// Rule of 5
-	Game(const Game& other);
-	Game(Game&& other) noexcept;
+//	Game(const Game& other);
+//	Game(Game&& other) noexcept;
 	~Game() = default;
 
 	Game& Play(Col col);
@@ -21,7 +21,7 @@ public:
 
 	void SwitchPlayer();
 	void CreateAlgo(Player playAs, uint8_t depth);
-	[[nodiscard]] bool HasAlgo() const { return m_algoActive; }
+	bool CanAcceptInput();
 
 	[[nodiscard]] Player Playing() const { return m_playing; }
 
@@ -53,20 +53,16 @@ private:
 	GameState m_gameState;
 	Player m_playing;
 
-	// used to know whether the algo was default constructed 
-	// at compile time or attached by the user
-	bool m_algoActive = false;
+	std::unique_ptr<MinMax> m_algoP1;
+	std::unique_ptr<MinMax> m_algoP2;
 
-	std::unique_ptr<MinMax> m_algo;
-	std::unique_ptr<MinMax> m_algoSecond;
-
-	std::thread m_algoThread;
-	std::thread m_algoSecondThread;
+	std::thread m_algoP1Thread;
+	std::thread m_algoP2Thread;
 
 	std::optional<Col> m_lastPlay; // the last column to be played, empty before first move
 	std::optional<Alignment> m_alignment{};
 
 	void UpdateBoardState();
-	void AlgoWorkerFunc(bool primary=true);
-	void AlgoPlayTurn(bool primary=true);
+	void AlgoWorkerFunc(Player player);
+	void AlgoPlayTurn(Player player);
 };

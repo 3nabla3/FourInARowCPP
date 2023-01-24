@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Game.h"
-#include "glog/logging.h"
 
 using std::optional, std::pair, std::vector, std::array;
 
@@ -12,34 +11,41 @@ Game::Game(Board&& initial_board) : m_board(std::move(initial_board)), m_gameSta
 	UpdateBoardState();
 }
 
-Game::Game(const Game& other)
-		: m_algo(std::make_unique<MinMax>(other.m_algo->PlayingAs(), other.m_algo->GetMaxDepth())),
-		  m_playing(other.m_playing), m_gameState(other.m_gameState), m_board(other.m_board),
-		  m_algoActive(other.m_algoActive) {
-	DLOG(WARNING) << "Calling Game copy constructor";
-}
-
-Game::Game(Game&& other) noexcept
-		: m_algo(std::move(other.m_algo)), m_playing(other.m_playing), m_gameState(other.m_gameState),
-		  m_board(std::move(other.m_board)),
-		  m_algoActive(other.m_algoActive) {
-	DLOG(WARNING) << "Calling Game R-value move constructor";
-}
+//Game::Game(const Game& other)
+//		: m_algoP1(std::make_unique<MinMax>(other.m_algoP1->PlayingAs(), other.m_algoP1->GetMaxDepth())),
+//          m_playing(other.m_playing), m_gameState(other.m_gameState), m_board(other.m_board),
+//          m_algoActive(other.m_algoActive) {
+//	DLOG(WARNING) << "Calling Game copy constructor";
+//}
+//
+//Game::Game(Game&& other) noexcept
+//		: m_algoP1(std::move(other.m_algoP1)), m_playing(other.m_playing), m_gameState(other.m_gameState),
+//          m_board(std::move(other.m_board)),
+//          m_algoActive(other.m_algoActive) {
+//	DLOG(WARNING) << "Calling Game R-value move constructor";
+//}
 
 /// Construct a min max algorithm that the game object will own
 void Game::CreateAlgo(Player playAs, uint8_t depth) {
-	// if the primary algo is not already set
-	if (!m_algo) {
-		m_algo = std::make_unique<MinMax>(playAs, depth);
-		m_algo->SetBoard(&m_board);
+	if (playAs == Player::P1) {
+		if (m_algoP1)
+			LOG(FATAL) << "Player 1 MinMax already set!";
+		m_algoP1 = std::make_unique<MinMax>(playAs, depth);
+		m_algoP1->SetBoard(&m_board);
+	} else {
+		if (m_algoP2)
+			LOG(FATAL) << "Player 2 MinMax already set!";
+		m_algoP2 = std::make_unique<MinMax>(playAs, depth);
+		m_algoP2->SetBoard(&m_board);
 	}
-	// if it is set, use the secondary algo
-	else {
-		m_algoSecond = std::make_unique<MinMax>(playAs, depth);
-		m_algoSecond->SetBoard(&m_board);
-	}
-	// mark the algos as active
-	m_algoActive = true;
+}
+
+bool Game::CanAcceptInput() {
+	if (Playing() == Player::P1 && !m_algoP1 ||
+			Playing() == Player::P2 && !m_algoP2)
+		return true;
+	LOG(WARNING) << "Not accepting user input right now";
+	return false;
 }
 
 /// Verify if the board is valid, and then who's turn is it to play
@@ -63,21 +69,17 @@ Player Game::GetPlaysNext(const Board& board) {
 		return Player::P2;
 }
 
-void Game::AlgoPlayTurn(bool primary) {
+void Game::AlgoPlayTurn(Player player) {
 	/// Carry out the steps the algorithm must play on its turn
-	auto& algo = primary ? m_algo : m_algoSecond;
+	auto& algo = player == Player::P1 ? m_algoP1 : m_algoP2;
 
 	// if the human played before the algo,
 	// shift the algo's tree to reflect that
+	// (the only case where that is not true is when the algo starts the game)
 	if (m_lastPlay) {
 		algo->ShiftTree(m_lastPlay.value());
 		algo->AddLayer();
 	}
-
-	uint32_t theoCount = TreeNode::NumNodesInFullTree(Board::N_COLS, algo->GetMaxDepth());
-	DLOG(INFO) << "Number of theoretical nodes:\t" << theoCount;
-	uint32_t actualCount = algo->GetHead()->GetNumNodes();
-	DLOG(INFO) << "Number of actual nodes:\t" << actualCount;
 
 	auto col = algo->GetBestMove();
 	Play(col);
@@ -87,19 +89,21 @@ void Game::AlgoPlayTurn(bool primary) {
 
 static std::mutex mutex;
 
-void Game::AlgoWorkerFunc(bool primary) {
-	auto& algo = primary ? m_algo : m_algoSecond;
+void Game::AlgoWorkerFunc(Player player) {
+	auto& algo = player == Player::P1 ? m_algoP1 : m_algoP2;
 
 	using namespace std::chrono_literals;
-	// TODO: is is possible that the if condition is false?
+	// TODO: is it possible that the if condition is false?
 	// if the tree has not been generated yet
 	if (!algo->GetHead())
 		algo->GenerateTree();
+	else
+		LOG(FATAL) << "tree has already been generated";
 
-	while (m_algoActive) {
-		if (m_playing == algo->PlayingAs() && !IsGameOver()) {
+	while (!IsGameOver()) {
+		if (m_playing == algo->PlayingAs()) {
 			mutex.lock();
-			AlgoPlayTurn(primary);
+			AlgoPlayTurn(player);
 			mutex.unlock();
 		}
 
@@ -109,21 +113,24 @@ void Game::AlgoWorkerFunc(bool primary) {
 }
 
 void Game::Start() {
-	DLOG(INFO) << "Launching MinMax worker thread...";
-	m_algoThread = std::thread(&Game::AlgoWorkerFunc, this, true);
-	if (m_algoSecond)
-		m_algoSecondThread = std::thread(&Game::AlgoWorkerFunc, this, false);
+	if (m_algoP1 || m_algoP2)
+		DLOG(INFO) << "Launching MinMax worker thread...";
+	if (m_algoP1)
+		m_algoP1Thread = std::thread(&Game::AlgoWorkerFunc, this, Player::P1);
+	if (m_algoP2)
+		m_algoP2Thread = std::thread(&Game::AlgoWorkerFunc, this, Player::P2);
 }
 
 void Game::End() {
 	// ensures the thread stops
-	if (m_algoActive) {
-		m_algoActive = false;
-		m_algoThread.join();
-		if (m_algoSecond)
-			m_algoSecondThread.join();
-	}
-	DLOG(INFO) << "Algo thread has joined";
+	if (m_gameState == GameState::IN_PROGRESS)
+		m_gameState = GameState::TIE;
+
+	if (m_algoP1)
+		m_algoP1Thread.join();
+	if (m_algoP2)
+		m_algoP2Thread.join();
+	DLOG(INFO) << "Algo thread(s) has/have joined";
 }
 
 /// Let a user place a piece and update the state.
@@ -134,10 +141,22 @@ Game& Game::Play(Col col) {
 		return *this;
 	}
 
+	auto num_valid_cols = m_board.GetValidColumns().size();
+
 	// if the function returns false, the column is full,
 	// so we cannot process the input
 	if (!m_board.InsertPiece(col, ToPiece(m_playing)))
 		return *this;
+
+	if (num_valid_cols != m_board.GetValidColumns().size()) {
+		LOG(INFO) << "New Empty column, adding two layers to algo";
+		if (m_algoP1) {
+			m_algoP1->AddLayer(2);
+		}
+		if (m_algoP2) {
+			m_algoP2->AddLayer(2);
+		}
+	}
 
 	SwitchPlayer();
 	UpdateBoardState();

@@ -18,9 +18,10 @@ void MinMax::GenerateTree() {
 	DLOG(INFO) << "Finished generating tree";
 }
 
-void MinMax::AddLayer() {
-	DLOG(INFO) << "Updating next layer of tree..." << std::endl;
-	m_head->UpdateTree();
+void MinMax::AddLayer(int count) {
+	DLOG(INFO) << "Updating next layer(s) of tree..." << std::endl;
+	for (int i = 0; i < count; i++)
+		m_head->AddLayer();
 	DLOG(INFO) << "Finished updating tree";
 }
 
@@ -36,37 +37,39 @@ Col MinMax::GetBestMove() const {
 	// Initialize the best score to its worst case: + or - infinity depending on the maximizing value
 	Score bestScore = maximizing ? std::numeric_limits<Score>::min() : std::numeric_limits<Score>::max();
 	const TreeNode* bestChildren[m_head->GetChildren().size()];
-	int idx = 0;
+	int bestChildrenIdx = 0;
 
 	LOG(INFO) << "------------------------------------";
 	if (maximizing)
-		LOG(INFO) << "Calculated scores: higher is better for MinMax";
+		LOG(INFO) << "higher is better for MinMax";
 	else
-		LOG(INFO) << "Calculated scores: lower is better for MinMax";
+		LOG(INFO) << "lower is better for MinMax";
+	LOG(INFO) << "General\t--> score: " << std::to_string(m_head->GetScore());
 
 	for (const auto& child: m_head->GetChildren()) {
-		Score childScore = child->GetScore(m_maxDepth);
-		LOG(INFO) << "Column " << std::to_string(child->GetDelta()) << " -- score: " << std::to_string(childScore);
+		Score childScore = child->GetScore();
+		LOG(INFO) << "Column " << std::to_string(child->GetDelta()) << "\t--> score: " << std::to_string(childScore);
+
 		// if the score is equal to the best, append to the list of best children
 		if (bestScore == childScore)
-			bestChildren[idx++] = child.get();
+			bestChildren[bestChildrenIdx++] = child.get();
 
 		// if the score is better than the best score, reset the list and append the child
 		else if (maximizing && bestScore < childScore ||
 		!maximizing && bestScore > childScore) {
-			idx = 0;
+			bestChildrenIdx = 0;
 			bestScore = childScore;
-			bestChildren[idx++] = child.get();
+			bestChildren[bestChildrenIdx++] = child.get();
 		}
 	}
 
-	if (!idx) {
+	if (!bestChildrenIdx) {
 		// should never happen, only for debugging purposes
 		LOG(FATAL) << "Could not find a best move!";
 		exit(1);
 	}
 
-	const int chosenIdx = ChoseRandomChild(bestChildren, idx);
+	const int chosenIdx = ChoseRandomChild(bestChildren, bestChildrenIdx);
 
 	Col bestMove = bestChildren[chosenIdx]->GetDelta();
 	LOG(INFO) << "Chosen move: " << std::to_string(bestMove);
