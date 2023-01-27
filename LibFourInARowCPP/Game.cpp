@@ -135,17 +135,17 @@ Game& Game::Play(Col col) {
 	if (!m_board.InsertPiece(col, ToPiece(m_playing)))
 		return *this;
 
-	// TODO: refactor this to make it more readable
-	if (num_valid_cols != m_board.GetValidColumns().size()) {
-		if (m_algoP1) {
-			LOG(INFO) << "New Empty column, adding a layer to algo 1";
-			m_algoP1->AddLayer();
-		}
-		if (m_algoP2) {
-			LOG(INFO) << "New Empty column, adding a layer to algo 2";
-			m_algoP2->AddLayer();
-		}
-	}
+	// // TODO: refactor this to make it more readable
+	// if (num_valid_cols != m_board.GetValidColumns().size()) {
+	// 	if (m_algoP1) {
+	// 		LOG(INFO) << "New Empty column, adding a layer to algo 1";
+	// 		m_algoP1->AddLayer();
+	// 	}
+	// 	if (m_algoP2) {
+	// 		LOG(INFO) << "New Empty column, adding a layer to algo 2";
+	// 		m_algoP2->AddLayer();
+	// 	}
+	// }
 
 	SwitchPlayer();
 	UpdateBoardState();

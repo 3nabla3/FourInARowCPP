@@ -111,8 +111,8 @@ Score TreeNode::MinMax(Score alpha, Score beta) const {
 }
 
 Score TreeNode::CalculateStaticScore() const {
-	if (m_gameState == GameState::P1_WON) return 5;
-	if (m_gameState == GameState::P2_WON) return -5;
+	if (m_gameState == GameState::P1_WON) return std::numeric_limits<Score>::max();
+	if (m_gameState == GameState::P2_WON) return std::numeric_limits<Score>::min();
 	if (m_gameState == GameState::TIE) return 0;
 	return static_cast<Score>(CalculateStaticPlayerScore(Player::P1) - CalculateStaticPlayerScore(Player::P2));
 }
@@ -122,21 +122,24 @@ Score TreeNode::CalculateStaticScore() const {
 #define CheckDirection(genFn, maxIdx) \
 for (uint8_t idx = 0; idx < (maxIdx); idx++) { \
 	std::vector<BoardPiece> line = genFn(idx); \
-	int8_t length = AnalyzeLine(line, player); \
-	longestLength = std::max(longestLength, length); \
+	totalLength += AnalyzeLine(line, player); \
 }
 
 Score TreeNode::CalculateStaticPlayerScore(Player player) const {
 	// TODO: improve the static analysis to make sure the algorithm gets a more
 	//  detailed view of the game
-	int8_t longestLength = 0;
+	int8_t totalLength = 0;
 
-	CheckDirection(m_Board.GetRow, Board::N_ROWS)
-	CheckDirection(m_Board.GetCol, Board::N_COLS)
-	CheckDirection(m_Board.GetUpDiag, (uint8_t) (Board::N_COLS + Board::N_ROWS - 1))
-	CheckDirection(m_Board.GetDnDiag, (uint8_t) (Board::N_COLS + Board::N_ROWS - 1))
+	for (uint8_t idx = 0; idx < Board::N_ROWS; idx++)
+		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetRow(idx), player));
+	for (uint8_t idx = 0; idx < Board::N_COLS; idx++)
+		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetCol(idx), player));
+	for (uint8_t idx = 0; idx < (uint8_t) (Board::N_COLS + Board::N_ROWS - 1); idx++)
+		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetUpDiag(idx), player));
+	for (uint8_t idx = 0; idx < (uint8_t) (Board::N_COLS + Board::N_ROWS - 1); idx++)
+		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetDnDiag(idx), player));
 
-	return longestLength;
+	return totalLength;
 }
 
 bool TreeNode::FourInARowImpossible(std::vector<BoardPiece>::const_iterator begin,

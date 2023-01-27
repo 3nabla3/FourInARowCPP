@@ -30,6 +30,15 @@ void MinMax::ShiftTree(Col col) {
 	m_head = m_head->GetChildFromDelta(col);;
 }
 
+static std::string ScoreToString(Score score) {
+	if (score == std::numeric_limits<Score>::max())
+		return "Player 1 wins";
+	else if (score == std::numeric_limits<Score>::min())
+		return "Player 2 wins";
+	else
+		return std::to_string(score);
+}
+
 Col MinMax::GetBestMove() const {
 	const bool maximizing = m_playingAs == Player::P1;
 
@@ -43,11 +52,11 @@ Col MinMax::GetBestMove() const {
 		LOG(INFO) << "higher is better for MinMax";
 	else
 		LOG(INFO) << "lower is better for MinMax";
-	LOG(INFO) << "General\t--> score: " << std::to_string(m_head->GetScore());
+	LOG(INFO) << "General\t--> score: " << ScoreToString(m_head->GetScore());
 
 	for (const auto& child: m_head->GetChildren()) {
 		Score childScore = child->GetScore();
-		LOG(INFO) << "Column " << std::to_string(child->GetDelta()) << "\t--> score: " << std::to_string(childScore);
+		LOG(INFO) << "Column " << std::to_string(child->GetDelta()) << "\t--> score: " << ScoreToString(childScore);
 
 		// if the score is equal to the best, append to the list of best children
 		if (bestScore == childScore)
