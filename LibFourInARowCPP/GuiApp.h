@@ -28,16 +28,18 @@ private:
 	void RenderPiece(BoardPiece piece, Row row, Col col) const;
 	void ResetColor() const;
 	void RenderBoard() const;
+
+	void ProcessKey(uint8_t key);
 	void Play(Col col);
 
 	[[nodiscard]] inline bool ShouldHighlight(Row row, Col col) const;
-
 	Game* m_Game;
 	GLFWwindow* m_Window;
-	float m_ResetColor[3] = {1.f, 1.f, 1.f};
 
+	float m_ResetColor[3] = {1.f, 1.f, 1.f};
 	const uint16_t m_Height;
 	const uint16_t m_Width;
+
 	const float m_HeightMarginFrac = .03f;
 	const float m_WidthMarginFrac = .03f;
 

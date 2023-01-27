@@ -10,9 +10,6 @@ public:
 	Game();
 	explicit Game(Board&& initial_board);
 
-	// Rule of 5
-//	Game(const Game& other);
-//	Game(Game&& other) noexcept;
 	~Game() = default;
 
 	Game& Play(Col col);
@@ -22,6 +19,7 @@ public:
 	void SwitchPlayer();
 	void CreateAlgo(Player playAs, uint8_t depth);
 	bool CanAcceptInput();
+	void Reset();
 
 	[[nodiscard]] Player Playing() const { return m_playing; }
 

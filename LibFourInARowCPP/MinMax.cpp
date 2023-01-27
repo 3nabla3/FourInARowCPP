@@ -25,6 +25,10 @@ void MinMax::AddLayer(int count) {
 	LOG(INFO) << "Finished updating tree";
 }
 
+void MinMax::Reset() {
+	m_head.reset();
+}
+
 /// Shift the new head of the tree to be one of its children
 void MinMax::ShiftTree(Col col) {
 	m_head = m_head->GetChildFromDelta(col);;

@@ -84,7 +84,10 @@ void GuiApp::RenderVerticalLines() const {
 
 	// for some reason, clang-tidy doesn't like for loop with floats
 	float x = startX;
-	while (x < endX) {
+
+	// add half a step to account for floating point errors
+	// and make sure that the last line is drawn
+	while (x < endX + (stepX / 2)) {
 		Vertex(x, m_HeightMarginFrac);
 		Vertex(x, 1 - m_HeightMarginFrac);
 		x += stepX;
@@ -132,10 +135,8 @@ void GuiApp::RenderPiece(BoardPiece piece, Row row, Col col) const {
 	float x = m_WidthMarginFrac + stepX * (float) col + stepX / 2;
 	float stepY = (1 - m_HeightMarginFrac * 2) / Board::N_ROWS;
 	float y = m_HeightMarginFrac + stepY * (float) e_row + stepY / 2;
-	// min is a macro on Windows but a function
-	// on unix so this should fix it
-	using std::min;
-	float r = min(stepX, stepY) / 4;
+
+	float r = std::min(stepX, stepY) / 4;
 
 	SetPieceColor(piece, ShouldHighlight(row, col));
 	RenderCircle(x, y, r);
@@ -189,9 +190,8 @@ void GuiApp::ResetColor() const {
 void GuiApp::KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
 	if (action == GLFW_PRESS) {
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
-		key -= 0x30; // convert the ascii char into the actual int value;
 		if (ui.gui->m_Game->CanAcceptInput())
-			ui.gui->Play(key);
+			ui.gui->ProcessKey((uint8_t)key);
 	}
 }
 
@@ -221,4 +221,13 @@ std::optional<Col> GuiApp::ConvertGLFWposToColumn(double x) const {
 	}
 	float ratio = (float) (x - marginWidth) / ((float) m_Width - marginWidth * 2);
 	return ratio * Board::N_COLS;
+}
+
+void GuiApp::ProcessKey(uint8_t key) {
+	if (key == 'r' || key == 'R')
+		m_Game->Reset();
+	else {
+		key -= 0x30; // convert the ascii char into the actual int value;
+		m_Game->Play(key);
+	}
 }

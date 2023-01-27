@@ -34,6 +34,25 @@ bool Game::CanAcceptInput() {
 	return false;
 }
 
+void Game::Reset() {
+	LOG(INFO) << "Resetting the game...";
+
+	End();
+	m_board.Reset();
+	if (m_algoP1)
+		m_algoP1->Reset();
+	if (m_algoP2)
+		m_algoP2->Reset();
+	m_alignment.reset();
+
+	m_playing = Player::P1;
+	m_lastPlay = std::nullopt;
+	m_gameState = GameState::IN_PROGRESS;
+	Start();
+
+	LOG(INFO) << "Game restarted!";
+}
+
 /// Verify if the board is valid, and then who's turn is it to play
 Player Game::GetPlaysNext(const Board& board) {
 
@@ -101,7 +120,7 @@ void Game::AlgoWorkerFunc(Player player) {
 
 void Game::Start() {
 	if (m_algoP1 || m_algoP2)
-		DLOG(INFO) << "Launching MinMax worker thread...";
+		DLOG(INFO) << "Launching MinMax worker thread(s)...";
 	if (m_algoP1)
 		m_algoP1Thread = std::thread(&Game::AlgoWorkerFunc, this, Player::P1);
 	if (m_algoP2)
@@ -110,8 +129,7 @@ void Game::Start() {
 
 void Game::End() {
 	// ensures the thread stops
-	if (m_gameState == GameState::IN_PROGRESS)
-		m_gameState = GameState::TIE;
+	m_gameState = GameState::TIE;
 
 	if (m_algoP1)
 		m_algoP1Thread.join();
@@ -128,7 +146,7 @@ Game& Game::Play(Col col) {
 		return *this;
 	}
 
-	auto num_valid_cols = m_board.GetValidColumns().size();
+	// auto num_valid_cols = m_board.GetValidColumns().size();
 
 	// if the function returns false, the column is full,
 	// so we cannot process the input
