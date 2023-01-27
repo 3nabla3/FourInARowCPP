@@ -38,7 +38,7 @@ int main([[maybe_unused]] int argc, char** argv) {
 //	Game game((Board(initial.get())));
 	Game game;
 	// game.CreateAlgo(Player::P1, 8);
-	game.CreateAlgo(Player::P2, 8);
+	game.CreateAlgo(Player::P2, 4);
 
 	GuiApp gui(game);
 	gui.Run();

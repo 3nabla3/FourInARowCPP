@@ -53,6 +53,7 @@ void GuiApp::Run() {
 	while (!glfwWindowShouldClose(m_Window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		UpdateEvalBar();
 		RenderGrid();
 		RenderBoard();
 
@@ -75,6 +76,51 @@ void GuiApp::RenderGrid() const {
 	RenderVerticalLines();
 	RenderHorizontalLines();
 	glEnd();
+}
+
+void GuiApp::RenderRectangle(float x1, float y1, float x2, float y2, const float* color) {
+	glColor3fv(color);
+	glBegin(GL_QUADS);
+	Vertex(x1, y1);
+	Vertex(x2, y1);
+	Vertex(x2, y2);
+	Vertex(x1, y2);
+	glEnd();
+}
+
+static float BarFractionFromScore(float score) {
+	float slope = 0.5f / 128.f;
+	float neutral = 0.5f;
+	return slope * score + neutral;
+}
+
+void GuiApp::RenderEvalVar(float score) const {
+	float barFraction = BarFractionFromScore(score);
+
+	float barWidth = 15;
+	float sideMarginWidth = m_WidthMarginFrac * (float)m_Width;
+	float bottomBottomMarginHeight = m_HeightMarginFrac * (float)m_Height;
+	float fullBarHeight = (float)m_Height - (2 * bottomBottomMarginHeight);
+
+	float barHeight = fullBarHeight * barFraction;
+
+	float x1, y1, x2, y2;
+	x1 = (sideMarginWidth / 2) - (barWidth / 2);
+	y1 = bottomBottomMarginHeight;
+	x2 = x1 + barWidth;
+	y2 = y1 + barHeight;
+
+	x1 = x1 / (float)m_Width;
+	y1 = y1 / (float)m_Height;
+	x2 = x2 / (float)m_Width;
+	y2 = y2 / (float)m_Height;
+
+	RenderRectangle(x1, y1, x2, y2, m_White);
+}
+
+void GuiApp::UpdateEvalBar() const {
+	Score score = m_Game->GetCurrentStaticScore();
+	RenderEvalVar(score);
 }
 
 void GuiApp::RenderVerticalLines() const {
@@ -166,20 +212,20 @@ void GuiApp::RenderBoard() const {
 	ResetColor();
 }
 
-void GuiApp::SetPieceColor(BoardPiece piece, bool highlight) {
+void GuiApp::SetPieceColor(BoardPiece piece, bool highlight) const {
 	// if the piece is empty, don't bother settings it because the circle
 	// should never even be drawn
 
 	if (highlight) {
 		if (piece == BoardPiece::P1)
-			glColor3f(1.f, 0.f, 0.f);
+			glColor3fv(m_P1ColorHighlight);
 		if (piece == BoardPiece::P2)
-			glColor3f(0.f, 0.f, 1.f);
+			glColor3fv(m_P2ColorHighlight);
 	} else {
 		if (piece == BoardPiece::P1)
-			glColor3f(.5f, 0.f, 0.f);
+			glColor3fv(m_P1Color);
 		if (piece == BoardPiece::P2)
-			glColor3f(0.f, 0.f, .5f);
+			glColor3fv(m_P2Color);
 	}
 }
 

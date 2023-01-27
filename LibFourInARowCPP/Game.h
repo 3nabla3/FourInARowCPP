@@ -38,6 +38,7 @@ public:
 	[[nodiscard]] inline std::optional<Col> GetLastPlay() const { return m_lastPlay; }
 
 	static Player GetPlaysNext(const Board& board);
+	[[nodiscard]] inline const Score GetCurrentStaticScore() const { return m_CurrentStaticScore; }
 
 	/// converts a player to its corresponding piece
 	static inline BoardPiece ToPiece(Player p) {
@@ -59,6 +60,8 @@ private:
 
 	std::optional<Col> m_lastPlay; // the last column to be played, empty before first move
 	std::optional<Alignment> m_alignment{};
+
+	Score m_CurrentStaticScore = 0.f;
 
 	void UpdateBoardState();
 	void AlgoWorkerFunc(Player player);

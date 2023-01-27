@@ -165,6 +165,11 @@ Game& Game::Play(Col col) {
 	// 	}
 	// }
 
+	// TODO: instead of this have another thread run a min max algo and continuously
+	//  analyze the board similarly to chess.com
+	TreeNode tn(m_board, Playing() == Player::P1, col);
+	m_CurrentStaticScore = tn.GetScore();
+
 	SwitchPlayer();
 	UpdateBoardState();
 	m_lastPlay = col;
