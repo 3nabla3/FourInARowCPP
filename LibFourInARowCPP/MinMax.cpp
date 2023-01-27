@@ -11,18 +11,18 @@ void MinMax::GenerateTree() {
 	if (!m_Board)
 		LOG(FATAL) << "The board has not been set!";
 
-	DLOG(INFO) << "Generating tree of depth " << std::to_string(m_maxDepth) << "..." << std::endl;
+	LOG(INFO) << "Generating tree of depth " << std::to_string(m_maxDepth) << "..." << std::endl;
 	bool maximizing = Game::GetPlaysNext(*m_Board) == Player::P1;
 	m_head = std::make_shared<TreeNode>(*m_Board, maximizing);
 	m_head->GenerateTree(m_maxDepth);
-	DLOG(INFO) << "Finished generating tree";
+	LOG(INFO) << "Finished generating tree";
 }
 
 void MinMax::AddLayer(int count) {
-	DLOG(INFO) << "Updating next layer(s) of tree..." << std::endl;
+	LOG(INFO) << "Updating next layer of tree..." << std::endl;
 	for (int i = 0; i < count; i++)
 		m_head->AddLayer();
-	DLOG(INFO) << "Finished updating tree";
+	LOG(INFO) << "Finished updating tree";
 }
 
 /// Shift the new head of the tree to be one of its children
