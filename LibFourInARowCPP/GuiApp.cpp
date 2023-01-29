@@ -189,8 +189,7 @@ void GuiApp::ResetColor() const {
 void GuiApp::KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
 	if (action == GLFW_PRESS) {
 		UserInfo& ui = *(UserInfo*) glfwGetWindowUserPointer(window);
-		if (ui.gui->m_Game->CanAcceptInput())
-			ui.gui->ProcessKey((uint8_t)key);
+		ui.gui->ProcessKey((uint8_t)key);
 	}
 }
 
@@ -225,7 +224,7 @@ std::optional<Col> GuiApp::ConvertGLFWposToColumn(double x) const {
 void GuiApp::ProcessKey(uint8_t key) {
 	if (key == 'r' || key == 'R')
 		m_Game->Reset();
-	else {
+	else if (m_Game->CanAcceptInput()){
 		key -= 0x30; // convert the ascii char into the actual int value;
 		m_Game->Play(key);
 	}
