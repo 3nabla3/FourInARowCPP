@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_AnalyzeLine2) {
 	using BoardPiece::EMPTY;
 	using BoardPiece::P1;
 	using BoardPiece::P2;
-	Score score = TreeNode::AnalyzeLine({EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	P2},	Player::P1);
+	Score score = TreeNode::AnalyzeLine({P2, EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY},	Player::P1);
 	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({P2,		EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY},	Player::P1), 0);
 	BOOST_CHECK_EQUAL((int)TreeNode::AnalyzeLine({EMPTY,	EMPTY,	EMPTY,	EMPTY,	EMPTY,	P2},	Player::P1), 0);
 }

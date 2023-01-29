@@ -167,11 +167,13 @@ Score TreeNode::AnalyzeLine(const std::vector<BoardPiece>& line, Player player) 
 	BoardPiece otherPiece = player == Player::P1 ? BoardPiece::P2 : BoardPiece::P1;
 	std::vector<Score> results; // holds the results of AnalyzeLine_Impl for each segment
 	auto segmentStart = line.begin();
-	for (auto it = std::begin(line); it != std::end(line); it++) {
+	while (*segmentStart == otherPiece)
+		segmentStart++;
+	for (auto it = segmentStart; it != std::end(line); it++) {
 		if (*it != otherPiece) continue;
-		auto segmentEnd = it + 1; // the end is exclusive
+		auto segmentEnd = it; // the end is exclusive
 		results.push_back(AnalyzeLine_Impl(segmentStart, segmentEnd, player));
-		segmentStart = it + 1;  // set the start of the next segment
+		segmentStart = segmentEnd;  // set the start of the next segment
 	}
 	// calculate the last segment once we've reached the end of the line
 	results.push_back(AnalyzeLine_Impl(segmentStart, line.end(), player));
@@ -188,7 +190,7 @@ Score TreeNode::AnalyzeLine_Impl(std::vector<BoardPiece>::const_iterator begin,
 	uint8_t pre = 0, chain = 0, post = 0;
 	auto size = end - begin;
 	uint8_t inner[size / 2]; // the number of inner spaces should not be greater than that
-	std::fill(inner, inner + size, 0); // 0 out the array
+	std::fill(inner, inner + sizeof inner, 0); // 0 out the array
 	uint8_t innerIdx = 0; // used to append to inner
 
 	for (auto it = begin; it != end; it++) {
@@ -219,7 +221,7 @@ Score TreeNode::AnalyzeLine_Impl(std::vector<BoardPiece>::const_iterator begin,
 		if (pre + chain + sumInner + post >= 4)
 			return (Score) chain;
 	}
-		// if the chain is in one piece, and we can extend it to 4
+	// if the chain is in one piece, and we can extend it to 4
 	else if (pre + chain + post >= 4)
 		return (Score) chain;
 	// if we cannot find a chain that can be extended to 4
