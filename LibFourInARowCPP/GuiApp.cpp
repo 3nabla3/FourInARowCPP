@@ -107,11 +107,10 @@ void GuiApp::RenderHorizontalLines() const {
 	}
 }
 
-static bool InAlignment(const std::array<Coord, 4> align, Row row, Col col) {
-	auto res = std::ranges::any_of(align.begin(), align.end(), [row, col](auto elem) {
-		return (elem.first == row && elem.second == col);
+static bool InAlignment(const std::array<Coord, 4>& align, Row row, Col col) {
+	return std::ranges::any_of(align.begin(), align.end(), [row, col](const Coord& coord) {
+		return coord.first == row && coord.second == col;
 	});
-	return res;
 }
 
 bool GuiApp::ShouldHighlight(Row row, Col col) const {
