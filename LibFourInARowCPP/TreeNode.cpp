@@ -128,18 +128,21 @@ for (uint8_t idx = 0; idx < (maxIdx); idx++) { \
 Score TreeNode::CalculateStaticPlayerScore(Player player) const {
 	// TODO: improve the static analysis to make sure the algorithm gets a more
 	//  detailed view of the game
-	int8_t totalLength = 0;
+	Score rowLength = 0, colLength = 0, upDiagLength = 0, dnDiagLength = 0;
 
 	for (uint8_t idx = 0; idx < Board::N_ROWS; idx++)
-		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetRow(idx), player));
-	for (uint8_t idx = 0; idx < Board::N_COLS; idx++)
-		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetCol(idx), player));
+		rowLength = (Score)(rowLength + AnalyzeLine(m_Board.GetRow(idx), player));
+	for (uint8_t idx = 0; idx < Board::N_COLS; idx++) {
+		const auto& temp = m_Board.GetCol(idx);
+		colLength = (Score) (colLength + AnalyzeLine(temp, player));
+	}
 	for (uint8_t idx = 0; idx < (uint8_t) (Board::N_COLS + Board::N_ROWS - 1); idx++)
-		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetUpDiag(idx), player));
+		upDiagLength = (Score)(upDiagLength + AnalyzeLine(m_Board.GetUpDiag(idx), player));
 	for (uint8_t idx = 0; idx < (uint8_t) (Board::N_COLS + Board::N_ROWS - 1); idx++)
-		totalLength = (Score)(totalLength + AnalyzeLine(m_Board.GetDnDiag(idx), player));
+		dnDiagLength = (Score)(dnDiagLength + AnalyzeLine(m_Board.GetDnDiag(idx), player));
 
-	return totalLength;
+	auto totalLength = (Score)(rowLength + colLength + upDiagLength + dnDiagLength);
+	return (Score)totalLength;
 }
 
 bool TreeNode::FourInARowImpossible(std::vector<BoardPiece>::const_iterator begin,
