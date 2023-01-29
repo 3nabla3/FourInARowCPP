@@ -78,36 +78,22 @@ void TreeNode::GenerateTree(uint8_t depth) {
 
 Score TreeNode::MinMax(Score alpha, Score beta) const {
 	/// https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
-
 	if (IsLeaf())
 		return CalculateStaticScore();
 
-	if (m_IsMaximizing) {
-		Score bestVal = std::numeric_limits<Score>::min();
-		for (const auto& child: m_Children) {
-			Score value = child->MinMax(alpha, beta);
-//            child->m_Score = value;
-
-			bestVal = std::max(bestVal, value);
-			alpha = std::max(alpha, bestVal);
-			if (beta <= alpha)
-				break;
-		}
-		return bestVal;
+	// the minimizing and maximizing branches have been merged for clarity
+	Score bestVal = WorstScoreOf(std::numeric_limits<Score>::min(), std::numeric_limits<Score>::max());
+	for (const auto& child: m_Children) {
+		Score value = child->MinMax(alpha, beta);
+		bestVal = BestScoreOf(bestVal, value);
+		if (IsMaximizing())
+			alpha = BestScoreOf(alpha, bestVal);
+		else
+			beta = BestScoreOf(beta, bestVal);
+		if (beta <= alpha)
+			break;
 	}
-	else {
-		Score bestVal = std::numeric_limits<Score>::max();
-		for (const auto& child: m_Children) {
-			Score value = child->MinMax(alpha, beta);
-//            child->m_Score = value;
-
-			bestVal = std::min(bestVal, value);
-			beta = std::min(beta, bestVal);
-			if (beta <= alpha)
-				break;
-		}
-		return bestVal;
-	}
+	return bestVal;
 }
 
 Score TreeNode::CalculateStaticScore() const {

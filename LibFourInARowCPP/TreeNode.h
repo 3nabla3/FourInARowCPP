@@ -19,6 +19,14 @@ public:
 
 	[[nodiscard]] inline bool IsMaximizing() const { return m_IsMaximizing; }
 
+	[[nodiscard]] inline Score BestScoreOf(Score s1, Score s2) const {
+		return IsMaximizing() ? std::max(s1, s2) : std::min(s1, s2);
+	}
+
+	[[nodiscard]] inline Score WorstScoreOf(Score s1, Score s2) const {
+		return IsMaximizing() ? std::min(s1, s2) : std::max(s1, s2);
+	}
+
 	[[nodiscard]] inline Col GetDelta() const { return m_delta; }
 
 	[[nodiscard]] Score GetScore() const;
@@ -44,7 +52,8 @@ private:
 	mutable std::optional<GameState> m_gameState;
 
 	Col m_delta; // the column that was played on the parent board that led to this board
-
+	// ensures the algo wins as fast as possible and looses as slow as possible
+	float m_dampingFactor = 0.9f;
 
 	[[nodiscard]] bool IsLeaf() const { return m_Children.empty(); }
 
