@@ -27,28 +27,27 @@ int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
-//	std::string initialString = "\t\t\t\t\t\t\n"
-//	                            "\t\t\t\t\t\t\n"
-//	                            "\t\t\t\t\t\t\n"
-//	                            "\t\t\t\t\t\t\n"
-//	                            "\t\t\t\t\t\t\n"
-//	                            "\t\t\tx\t\t\t";
-//	std::unique_ptr<BoardPiece[]> initial(ArrayFromString(initialString));
-//	for (Col col = 0; col < Board::N_COLS; col++) {
-//		Board board(initial.get());
-//		board.InsertPiece(col, BoardPiece::P2);
-//		TreeNode tn(board, true, col);
-//		Score score = tn.GetScore();
-//		LOG(INFO) << std::to_string(col) << " score: " << std::to_string(score);
-//	}
+	// std::string initialString = "\t\t\t\t\t\t\n"
+	//                             "\t\t\t\t\t\t\n"
+	//                             "\t\t\t\t\t\t\n"
+	//                             "\t\t\t\t\t\t\n"
+	//                             "\t\t\t\t\t\t\n"
+	//                             "\t\t\tx\t\t\t";
+	// std::unique_ptr<BoardPiece[]> initial(ArrayFromString(initialString));
+	// for (Col col = 0; col < Board::N_COLS; col++) {
+	// 	Board board(initial.get());
+	// 	board.InsertPiece(col, BoardPiece::P2);
+	//
+	// 	TreeNode tn(board, true, col);
+	// 	Score score = tn.GetScore();
+	// 	LOG(INFO) << std::to_string(col) << " score: " << std::to_string(score);
+	// }
 
 //	Game game((Board(initial.get())));
 	Game game;
 //	game.CreateAlgo(Player::P1, 7);
-	game.CreateAlgo(Player::P2, 7);
+	game.CreateAlgo(Player::P2, 6);
 
-	GuiApp gui(game);
-	gui.Run();
-
+	GuiApp(game).Run();
 	return 0;
 }

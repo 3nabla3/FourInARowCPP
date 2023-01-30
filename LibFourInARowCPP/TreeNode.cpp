@@ -116,8 +116,10 @@ Score TreeNode::CalculateStaticPlayerScore(Player player) const {
 	//  detailed view of the game
 	Score rowLength = 0, colLength = 0, upDiagLength = 0, dnDiagLength = 0;
 
-	for (uint8_t idx = 0; idx < Board::N_ROWS; idx++)
-		rowLength = (Score)(rowLength + AnalyzeLine(m_Board.GetRow(idx), player));
+	for (uint8_t idx = 0; idx < Board::N_ROWS; idx++) {
+		const auto& line = m_Board.GetRow(idx);
+		rowLength = (Score) (rowLength + AnalyzeLine(line, player));
+	}
 	for (uint8_t idx = 0; idx < Board::N_COLS; idx++) {
 		const auto& temp = m_Board.GetCol(idx);
 		colLength = (Score) (colLength + AnalyzeLine(temp, player));
@@ -159,7 +161,7 @@ Score TreeNode::AnalyzeLine(const std::vector<BoardPiece>& line, Player player) 
 		if (*it != otherPiece) continue;
 		auto segmentEnd = it; // the end is exclusive
 		results.push_back(AnalyzeLine_Impl(segmentStart, segmentEnd, player));
-		segmentStart = segmentEnd;  // set the start of the next segment
+		segmentStart = segmentEnd + 1;  // set the start of the next segment
 	}
 	// calculate the last segment once we've reached the end of the line
 	results.push_back(AnalyzeLine_Impl(segmentStart, line.end(), player));
