@@ -18,6 +18,21 @@ cd FourInARowCPP
 ./setup.bash
 ```
 
+## How to play
+To select a column for the piece:
+* click on the column with the cursor; or
+* enter the number of the column on the keyboard (0 is the left-most column)
+
+To restart the game at any point:
+* press `r` on the keyboard
+
+To quit the game:
+* click the close button on the window
+
+To view the minimax algorithm's though process
+* look at the terminal from which the `./setup.bash` command was run
+
+
 ## How minimax works
 The algorithm looks far into the future and decides what move is the best to play
 making the hypothesis that the opponent will play their optimal move. The algorithm can
