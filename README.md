@@ -12,7 +12,7 @@ the `main.c` file can be modified to ensure a human or minimax plays Player1 or 
 Tested on Ubuntu 22.04 LTS
 ```
 sudo apt update
-sudo apt install libxinerama-dev libxcursor-dev
+sudo apt install libxinerama-dev libxcursor-dev cmake ninja
 git clone https://github.com/3nabla3/FourInARowCPP.git
 cd FourInARowCPP
 ./setup.bash
