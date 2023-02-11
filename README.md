@@ -8,6 +8,16 @@ just sick back and watch the computer play itself. Humans can also play against 
 computer by setting only one player to minimax. Before compiling the program, 
 the `main.c` file can be modified to ensure a human or minimax plays Player1 or Player2.
 
+## How to run
+Tested on Ubuntu 22.04 LTS
+```
+sudo apt update
+sudo apt install libxinerama-dev libxcursor-dev
+git clone https://github.com/3nabla3/FourInARowCPP.git
+cd FourInARowCPP
+./setup.bash
+```
+
 ## How minimax works
 The algorithm looks far into the future and decides what move is the best to play
 making the hypothesis that the opponent will play their optimal move. The algorithm can
