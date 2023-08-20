@@ -102,13 +102,14 @@ void Game::AlgoWorkerFunc(Player player) {
 
 	using namespace std::chrono_literals;
 	// TODO: is it possible that the if condition is false?
-	// if the tree has not been generated yet
+	//  if the tree has not been generated yet
 	if (!algo->GetHead())
 		algo->GenerateTree();
 	else
 		LOG(FATAL) << "tree has already been generated";
 
 	while (!IsGameOver()) {
+        DLOG(INFO) << "Loop";
 		if (m_playing == algo->PlayingAs()) {
 			AlgoPlayTurn(player);
 		}

@@ -12,10 +12,11 @@ the `main.c` file can be modified to ensure a human or minimax plays Player1 or 
 Tested on Ubuntu 22.04 LTS
 ```
 sudo apt update
-sudo apt install git g++ libgflags-dev libxinerama-dev libxcursor-dev libxrandr-dev libxi-dev cmake ninja-build
+sudo apt install git g++ libgflags-dev libxinerama-dev libxcursor-dev \
+libxrandr-dev libxi-dev libstb-dev cmake ninja-build
 git clone https://github.com/3nabla3/FourInARowCPP.git
 cd FourInARowCPP
-./setup.bash
+./run.bash
 ```
 
 ## How to play
@@ -30,7 +31,7 @@ To quit the game:
 * click the close button on the window
 
 To view the minimax algorithm's though process
-* look at the terminal from which the `./setup.bash` command was run
+* look at the terminal from which the `./run.bash` command was run
 
 
 ## How minimax works

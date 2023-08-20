@@ -27,16 +27,6 @@ int main([[maybe_unused]] int argc, char** argv) {
 	FLAGS_logtostdout = true;
 	google::InitGoogleLogging(argv[0]);
 
-	// std::string initialString = "\t\t\t\t\t\t\n"
-	//                             "\t\t\t\t\t\t\n"
-	//                             "\t\t\t\t\t\t\n"
-	//                             "\t\t\t\t\t\t\n"
-	//                             "\t\t\t\t\t\t\n"
-	//                             "\t\t\tx\t\t\t";
-	// std::unique_ptr<BoardPiece[]> initial(ArrayFromString(initialString));
-
-//	Game game((Board(initial.get())));
-
 	Game game;
 //	game.CreateAlgo(Player::P1, 7);
 	game.CreateAlgo(Player::P2, 7);
